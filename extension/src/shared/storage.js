@@ -62,9 +62,6 @@ const StorageManager = {
           entry.messageCount !== undefined &&
           entry.messageCount !== expectedMessageCount
         ) {
-          console.log(
-            `[STM] Cache invalidated: message count changed from ${entry.messageCount} to ${expectedMessageCount}`
-          );
           resolve(null);
           return;
         }

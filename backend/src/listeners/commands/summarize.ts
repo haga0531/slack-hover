@@ -8,12 +8,7 @@ export function registerSummarizeCommand(app: App) {
   app.command("/summarize", async ({ command, ack, client, respond }) => {
     await ack();
 
-    const { channel_id, user_id, text } = command;
-
-    logger.info(
-      { channelId: channel_id, userId: user_id },
-      "Summarize command received"
-    );
+    const { channel_id, text } = command;
 
     try {
       // Parse target language from command text (e.g., "/summarize ja" or "/summarize en")

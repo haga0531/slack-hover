@@ -43,11 +43,6 @@ export class GeminiService {
     messages: ThreadMessage[],
     targetLanguage: SupportedLanguage
   ): Promise<StructuredSummary> {
-    logger.debug(
-      { messageCount: messages.length, targetLanguage },
-      "Generating summary"
-    );
-
     const prompt = buildSummaryPrompt(messages, targetLanguage);
 
     try {
@@ -62,15 +57,6 @@ export class GeminiService {
 
       const result = await generativeModel.generateContent(prompt);
       const response = result.response;
-
-      logger.debug(
-        {
-          candidates: response.candidates,
-          promptFeedback: response.promptFeedback,
-        },
-        "Gemini raw response"
-      );
-
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!text) {
@@ -85,8 +71,6 @@ export class GeminiService {
       }
 
       const parsed = JSON.parse(text) as Omit<StructuredSummary, "language">;
-
-      logger.info({ targetLanguage }, "Summary generated successfully");
 
       return {
         ...parsed,
@@ -113,8 +97,6 @@ export class GeminiService {
     message: ThreadMessage,
     targetLanguage: SupportedLanguage
   ): Promise<StructuredSummary> {
-    logger.debug({ targetLanguage }, "Translating single message");
-
     const prompt = buildTranslationPrompt(message, targetLanguage);
 
     try {
@@ -144,8 +126,6 @@ export class GeminiService {
       }
 
       const parsed = JSON.parse(text) as Omit<StructuredSummary, "language">;
-
-      logger.info({ targetLanguage }, "Translation generated successfully");
 
       return {
         ...parsed,

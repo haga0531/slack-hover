@@ -21,7 +21,6 @@ const summaryRequestSchema = z.object({
 export function setupSummaryRoute(router: Router) {
   router.post("/api/summary", async (req: Request, res: Response) => {
     const requestId = crypto.randomUUID();
-    logger.info({ requestId, body: req.body }, "Summary request received");
 
     try {
       // Validate request body
@@ -88,11 +87,6 @@ export function setupSummaryRoute(router: Router) {
               messages,
               target_lang as SupportedLanguage
             );
-
-      logger.info(
-        { requestId, messageCount: messages.length },
-        "Summary generated"
-      );
 
       const response: SummaryResponse = {
         status: "ok",

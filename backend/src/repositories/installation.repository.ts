@@ -5,7 +5,6 @@ import type {
   InstallationStore,
 } from "@slack/oauth";
 import { env } from "../config/env.js";
-import { logger } from "../middleware/logger.js";
 
 const COLLECTION_NAME = "slack_installations";
 
@@ -39,8 +38,6 @@ export function createInstallationStore(): InstallationStore {
       const db = getFirestore();
       const installationId = getInstallationId(installation);
 
-      logger.info({ installationId }, "Storing installation");
-
       await db.collection(COLLECTION_NAME).doc(installationId).set({
         installation,
         updatedAt: new Date().toISOString(),
@@ -58,8 +55,6 @@ export function createInstallationStore(): InstallationStore {
       } else {
         throw new Error("Invalid query: no teamId or enterpriseId");
       }
-
-      logger.debug({ installationId }, "Fetching installation");
 
       const doc = await db
         .collection(COLLECTION_NAME)
@@ -85,8 +80,6 @@ export function createInstallationStore(): InstallationStore {
       } else {
         throw new Error("Invalid query: no teamId or enterpriseId");
       }
-
-      logger.info({ installationId }, "Deleting installation");
 
       await db.collection(COLLECTION_NAME).doc(installationId).delete();
     },

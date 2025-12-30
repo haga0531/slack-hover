@@ -10,11 +10,8 @@ class STMController {
   }
 
   async initialize() {
-    console.log("[STM] Initializing Slack Thread Summarizer...");
-
     // Load settings
     this.settings = await window.StorageManager.getSettings();
-    console.log("[STM] Settings loaded:", this.settings);
 
     // Initialize UI managers
     this.hoverUI = new window.HoverUIManager({
@@ -32,8 +29,6 @@ class STMController {
     window.StorageManager.onSettingsChange((changes) => {
       this.onSettingsChange(changes);
     });
-
-    console.log("[STM] Initialization complete");
   }
 
   onNewMessage(messageElement) {
@@ -42,8 +37,6 @@ class STMController {
 
   async handleSummarizeRequest(messageElement) {
     const metadata = window.SlackDOMParser.extractMessageMetadata(messageElement);
-
-    console.log("[STM] Summarize request:", metadata);
 
     // Allow both thread messages (threadTs) and single messages (messageTs)
     const targetTs = metadata?.threadTs || metadata?.messageTs;
@@ -79,7 +72,6 @@ class STMController {
       );
 
       if (cached && cached.language === this.settings.targetLanguage) {
-        console.log("[STM] Using cached summary");
         this.summaryPopup.showSummary(cached.summary);
         return;
       }
@@ -124,7 +116,6 @@ class STMController {
 
       this.summaryPopup.showSummary(response.summary);
     } catch (error) {
-      console.error("[STM] Error:", error);
       this.summaryPopup.showError(error.message || "Failed to generate summary");
     }
   }
@@ -148,7 +139,6 @@ class STMController {
     if (changes.developerMode) {
       this.settings.developerMode = changes.developerMode.newValue;
     }
-    console.log("[STM] Settings updated:", this.settings);
   }
 }
 

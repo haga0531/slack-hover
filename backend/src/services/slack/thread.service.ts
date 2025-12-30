@@ -15,8 +15,6 @@ export class ThreadService {
     channelId: string,
     threadTs: string
   ): Promise<ThreadMessage[]> {
-    logger.debug({ channelId, threadTs }, "Fetching thread messages");
-
     const result = await this.client.conversations.replies({
       channel: channelId,
       ts: threadTs,
@@ -50,11 +48,6 @@ export class ThreadService {
       timestamp: msg.ts!,
       threadTs: msg.thread_ts,
     }));
-
-    logger.info(
-      { channelId, threadTs, messageCount: messages.length },
-      "Thread messages fetched"
-    );
 
     return messages;
   }

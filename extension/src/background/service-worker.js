@@ -27,8 +27,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 async function handleSummarizeRequest(payload) {
   const { channelId, threadTs, teamId, targetLanguage } = payload;
 
-  console.log("[STM Service Worker] Summarize request:", payload);
-
   const settings = await getSettings();
 
   if (!settings.apiEndpoint) {
@@ -74,10 +72,7 @@ async function getSettings() {
 // Handle installation
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install") {
-    console.log("[STM] Extension installed");
     // Open options page on first install
     chrome.runtime.openOptionsPage();
   }
 });
-
-console.log("[STM] Service Worker loaded");
