@@ -36,16 +36,32 @@ export class GeminiService {
         model: this.model,
         generationConfig: {
           responseMimeType: "application/json",
-          temperature: 0.3,
-          maxOutputTokens: 2048,
+          temperature: 0.2,
+          maxOutputTokens: 1024,
         },
       });
 
       const result = await generativeModel.generateContent(prompt);
       const response = result.response;
+
+      logger.debug(
+        {
+          candidates: response.candidates,
+          promptFeedback: response.promptFeedback,
+        },
+        "Gemini raw response"
+      );
+
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!text) {
+        logger.error(
+          {
+            candidates: JSON.stringify(response.candidates),
+            promptFeedback: JSON.stringify(response.promptFeedback),
+          },
+          "Empty response from Gemini"
+        );
         throw new Error("Empty response from Gemini");
       }
 

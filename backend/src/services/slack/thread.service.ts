@@ -27,26 +27,29 @@ export class ThreadService {
       return [];
     }
 
-    const messages: ThreadMessage[] = [];
+    // Filter valid messages first
+    const validMessages = result.messages.filter(
+      (msg) => msg.text && msg.ts && !msg.bot_id
+    );
 
-    for (const msg of result.messages) {
-      if (!msg.text || !msg.ts) continue;
+    // Collect unique user IDs for parallel resolution
+    const uniqueUserIds = [
+      ...new Set(validMessages.map((msg) => msg.user).filter(Boolean)),
+    ] as string[];
 
-      // Skip bot messages if needed
-      if (msg.bot_id) continue;
+    // Resolve all user names in parallel
+    await Promise.all(
+      uniqueUserIds.map((userId) => this.resolveUserName(userId))
+    );
 
-      const userName = msg.user
-        ? await this.resolveUserName(msg.user)
-        : "Unknown";
-
-      messages.push({
-        userId: msg.user || "unknown",
-        userName,
-        text: msg.text,
-        timestamp: msg.ts,
-        threadTs: msg.thread_ts,
-      });
-    }
+    // Build messages using cached user names
+    const messages: ThreadMessage[] = validMessages.map((msg) => ({
+      userId: msg.user || "unknown",
+      userName: msg.user ? this.userCache.get(msg.user) || msg.user : "Unknown",
+      text: msg.text!,
+      timestamp: msg.ts!,
+      threadTs: msg.thread_ts,
+    }));
 
     logger.info(
       { channelId, threadTs, messageCount: messages.length },

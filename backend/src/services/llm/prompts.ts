@@ -10,50 +10,24 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   de: "German",
 };
 
+const MAX_MESSAGES_FOR_PROMPT = 30;
+
 export function buildSummaryPrompt(
   messages: ThreadMessage[],
   targetLanguage: SupportedLanguage
 ): string {
   const languageName = LANGUAGE_NAMES[targetLanguage];
 
-  const threadContent = messages
-    .map((m) => `[${m.userName}]: ${m.text}`)
-    .join("\n\n");
+  // Limit messages to reduce input tokens
+  const limitedMessages = messages.slice(-MAX_MESSAGES_FOR_PROMPT);
 
-  return `You are a helpful assistant that summarizes Slack thread conversations.
+  const threadContent = limitedMessages
+    .map((m) => `${m.userName}: ${m.text}`)
+    .join("\n");
 
-Analyze the following Slack thread and provide a structured summary in ${languageName}.
+  return `Summarize this Slack thread in ${languageName}. Output JSON: {"overview":"2-3 sentence summary"}
 
-## Thread Content:
-${threadContent}
-
-## Instructions:
-1. Summarize the thread comprehensively
-2. Extract key decisions made
-3. Identify action items (TODOs) with assignees if mentioned
-4. Note any blockers or unresolved issues
-5. Include technical notes if relevant (code changes, API details, etc.)
-
-## Output Format:
-Respond with a JSON object in the following format:
-{
-  "title": "A brief title for the thread summary (in ${languageName})",
-  "overview": "A 2-3 sentence overview of what the thread discusses (in ${languageName})",
-  "decisions": ["List of decisions made in the thread (in ${languageName})"],
-  "todos": [
-    {
-      "text": "Action item description (in ${languageName})",
-      "assignee": "Slack user ID if mentioned (e.g., U12345678), or null",
-      "due": "Due date if mentioned, or null"
-    }
-  ],
-  "blockers": ["List of blockers or unresolved issues (in ${languageName})"],
-  "techNotes": ["Technical details, code snippets mentioned, API changes, etc. (in ${languageName})"]
-}
-
-If a section has no items, use an empty array [].
-Ensure all text content is in ${languageName}.
-Only output the JSON object, no additional text.`;
+${threadContent}`;
 }
 
 export const JSON_SCHEMA = {

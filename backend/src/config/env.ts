@@ -26,7 +26,7 @@ const envSchema = z.object({
   MAX_THREAD_MESSAGES: z.coerce.number().default(100),
 
   // LLM
-  GEMINI_MODEL: z.string().default("gemini-2.5-pro"),
+  GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
 });
 
 export type Env = z.infer<typeof envSchema>;
