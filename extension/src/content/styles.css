@@ -2,210 +2,102 @@
 
 /* Summarize Icon Button */
 .stm-summarize-icon {
-  position: absolute;
-  right: 8px;
-  top: 8px;
   width: 28px;
   height: 28px;
   border: none;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
-  z-index: 100;
+  transition: all 0.2s ease;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
 }
 
 .stm-summarize-icon svg {
-  color: #1264a3;
+  color: #6366f1;
+  transition: color 0.2s ease;
 }
 
-.c-virtual_list__item:hover .stm-summarize-icon,
-.stm-summarize-icon.stm-icon-hover {
-  opacity: 1;
-}
-
+.stm-summarize-icon.stm-icon-hover,
 .stm-summarize-icon:hover {
-  background-color: #1264a3;
+  opacity: 1;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .stm-summarize-icon:hover svg {
   color: white;
 }
 
-/* Popup Container */
-.stm-popup-container {
+/* Tooltip Container - Modern Glass Effect */
+.stm-tooltip {
   position: fixed;
   z-index: 10000;
-  width: 400px;
-  max-height: 500px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+  width: 500px;
+  background: linear-gradient(145deg, rgba(30, 30, 35, 0.95) 0%, rgba(20, 20, 25, 0.98) 100%);
+  color: #f1f1f1;
+  border-radius: 12px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-.stm-popup-content {
-  display: flex;
-  flex-direction: column;
-  max-height: 500px;
-}
-
-/* Popup Header */
-.stm-popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #1264a3;
-  color: white;
-  font-weight: 600;
   font-size: 14px;
+  line-height: 1.6;
+  backdrop-filter: blur(20px);
+  animation: stm-fade-in 0.2s ease-out;
 }
 
-.stm-popup-header.stm-error-header {
-  background: #e01e5a;
+@keyframes stm-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.stm-popup-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  opacity: 0.8;
+/* Tooltip Text */
+.stm-tooltip-text {
+  padding: 16px 20px;
+  letter-spacing: 0.01em;
 }
 
-.stm-popup-close:hover {
-  opacity: 1;
-}
-
-/* Popup Body */
-.stm-popup-body {
-  padding: 16px;
-  overflow-y: auto;
-  max-height: 420px;
-}
-
-.stm-popup-body.stm-loading {
+/* Tooltip Loading */
+.stm-tooltip-loading {
+  padding: 24px 48px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 150px;
-  color: #616061;
 }
 
-/* Loading Spinner */
+/* Tooltip Error */
+.stm-tooltip-error {
+  padding: 16px 20px;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border-radius: 12px;
+}
+
+/* Loading Spinner - Modern */
 .stm-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e0e0e0;
-  border-top-color: #1264a3;
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #8b5cf6;
   border-radius: 50%;
-  animation: stm-spin 0.8s linear infinite;
-  margin-bottom: 12px;
+  animation: stm-spin 0.7s linear infinite;
 }
 
 @keyframes stm-spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-/* Sections */
-.stm-section {
-  margin-bottom: 16px;
-}
-
-.stm-section:last-child {
-  margin-bottom: 0;
-}
-
-.stm-section h4 {
-  margin: 0 0 8px 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: #1d1c1d;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stm-section p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #1d1c1d;
-}
-
-.stm-section ul {
-  margin: 0;
-  padding-left: 20px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #1d1c1d;
-}
-
-.stm-section li {
-  margin-bottom: 4px;
-}
-
-/* Blockers Section */
-.stm-section.stm-blockers h4 {
-  color: #e01e5a;
-}
-
-.stm-section.stm-blockers ul {
-  color: #e01e5a;
-}
-
-/* Error State */
-.stm-popup-body.stm-error-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 24px;
-}
-
-.stm-error-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #fce4ec;
-  color: #e01e5a;
-  font-size: 24px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.stm-error-body p {
-  margin: 0 0 16px 0;
-  color: #616061;
-  font-size: 14px;
-}
-
-.stm-retry-button {
-  padding: 8px 16px;
-  background: #1264a3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.stm-retry-button:hover {
-  background: #0b4f8a;
 }

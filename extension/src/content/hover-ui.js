@@ -7,18 +7,15 @@ class HoverUIManager {
     this.currentMessage = null;
   }
 
-  // Attach hover listeners to a message element
   attachHoverListeners(messageElement) {
-    // Skip if already attached
     if (messageElement.dataset.stmAttached) return;
     messageElement.dataset.stmAttached = "true";
 
-    messageElement.addEventListener("mouseenter", (e) => {
-      this.showIcon(messageElement, e);
+    messageElement.addEventListener("mouseenter", () => {
+      this.showIcon(messageElement);
     });
 
     messageElement.addEventListener("mouseleave", (e) => {
-      // Don't hide if moving to the icon
       const relatedTarget = e.relatedTarget;
       if (relatedTarget && relatedTarget.closest(".stm-summarize-icon")) {
         return;
@@ -27,15 +24,12 @@ class HoverUIManager {
     });
   }
 
-  // Show summarize icon on message
-  showIcon(messageElement, event) {
-    // Remove existing icon
+  showIcon(messageElement) {
     this.hideIcon();
 
     const icon = this.createSummarizeIcon(messageElement);
     const rect = messageElement.getBoundingClientRect();
 
-    // Position icon at top-right of message
     icon.style.position = "fixed";
     icon.style.top = `${rect.top + 8}px`;
     icon.style.left = `${rect.right - 40}px`;
@@ -46,7 +40,6 @@ class HoverUIManager {
     this.currentMessage = messageElement;
   }
 
-  // Hide summarize icon
   hideIcon() {
     if (this.currentIcon) {
       this.currentIcon.remove();
@@ -55,12 +48,19 @@ class HoverUIManager {
     }
   }
 
-  // Create the summarize icon button
   createSummarizeIcon(messageElement) {
     const button = document.createElement("button");
     button.className = "stm-summarize-icon";
     button.title = "Summarize this thread";
-    button.innerHTML = this.getSvgIcon();
+    button.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+    `;
 
     button.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -68,7 +68,6 @@ class HoverUIManager {
       this.onSummarizeRequest(messageElement);
     });
 
-    // Keep icon visible while hovering over it
     button.addEventListener("mouseenter", () => {
       button.classList.add("stm-icon-hover");
     });
@@ -80,199 +79,120 @@ class HoverUIManager {
 
     return button;
   }
-
-  // SVG icon for summarize button
-  getSvgIcon() {
-    return `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-        <polyline points="14 2 14 8 20 8"></polyline>
-        <line x1="16" y1="13" x2="8" y2="13"></line>
-        <line x1="16" y1="17" x2="8" y2="17"></line>
-        <polyline points="10 9 9 9 8 9"></polyline>
-      </svg>
-    `;
-  }
 }
 
-// Summary Popup UI
+// Tooltip-style Summary Popup
 class SummaryPopup {
   constructor() {
     this.container = null;
+    this.hideTimeout = null;
   }
 
-  // Show popup at position
   show(position) {
-    this.hide(); // Remove any existing popup
+    this.hide();
     this.createContainer();
     this.setPosition(position);
     this.showLoading();
     document.body.appendChild(this.container);
   }
 
-  // Create popup container
   createContainer() {
     this.container = document.createElement("div");
-    this.container.className = "stm-popup-container";
+    this.container.className = "stm-tooltip";
 
-    // Close on click outside
-    setTimeout(() => {
-      document.addEventListener("click", this.handleOutsideClick.bind(this), {
-        once: true,
-      });
-    }, 100);
+    // Hover management - stay open while hovering tooltip
+    this.container.addEventListener("mouseenter", () => {
+      this.cancelHide();
+    });
+
+    this.container.addEventListener("mouseleave", () => {
+      this.scheduleHide();
+    });
 
     // Close on escape key
-    document.addEventListener("keydown", this.handleEscapeKey.bind(this));
+    this.escapeHandler = (e) => {
+      if (e.key === "Escape") {
+        this.hide();
+      }
+    };
+    document.addEventListener("keydown", this.escapeHandler);
   }
 
-  handleOutsideClick(e) {
-    if (this.container && !this.container.contains(e.target)) {
-      this.hide();
-    }
-  }
-
-  handleEscapeKey(e) {
-    if (e.key === "Escape") {
-      this.hide();
-    }
-  }
-
-  // Set popup position
   setPosition(position) {
     if (!this.container) return;
 
     const { x, y } = position;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    const tooltipWidth = 500;
+    const padding = 20;
 
-    // Default position to the right of the element
-    let left = x + 10;
+    // Center the tooltip horizontally, but keep within viewport
+    let left = x - tooltipWidth / 2;
     let top = y;
 
-    // Adjust if would go off screen
-    if (left + 400 > viewportWidth) {
-      left = x - 410;
+    // Keep within viewport with padding
+    if (left + tooltipWidth + padding > viewportWidth) {
+      left = viewportWidth - tooltipWidth - padding;
+    }
+    if (left < padding) {
+      left = padding;
     }
 
-    if (top + 300 > viewportHeight) {
-      top = viewportHeight - 320;
+    if (top + 200 > viewportHeight) {
+      top = viewportHeight - 220;
     }
 
     this.container.style.left = `${left}px`;
     this.container.style.top = `${top}px`;
   }
 
-  // Show loading state
   showLoading() {
     if (!this.container) return;
-
     this.container.innerHTML = `
-      <div class="stm-popup-content">
-        <div class="stm-popup-header">
-          <span>Thread Summary</span>
-          <button class="stm-popup-close" onclick="this.closest('.stm-popup-container').remove()">&times;</button>
-        </div>
-        <div class="stm-popup-body stm-loading">
-          <div class="stm-spinner"></div>
-          <span>Summarizing thread...</span>
-        </div>
+      <div class="stm-tooltip-loading">
+        <div class="stm-spinner"></div>
       </div>
     `;
   }
 
-  // Show summary result
   showSummary(summary) {
     if (!this.container) return;
-
-    const { title, overview, decisions, todos, blockers, techNotes } = summary;
-
-    let html = `
-      <div class="stm-popup-content">
-        <div class="stm-popup-header">
-          <span>${this.escapeHtml(title)}</span>
-          <button class="stm-popup-close" onclick="this.closest('.stm-popup-container').remove()">&times;</button>
-        </div>
-        <div class="stm-popup-body">
-          <div class="stm-section">
-            <h4>Overview</h4>
-            <p>${this.escapeHtml(overview)}</p>
-          </div>
-    `;
-
-    if (decisions && decisions.length > 0) {
-      html += `
-        <div class="stm-section">
-          <h4>Decisions</h4>
-          <ul>${decisions.map((d) => `<li>${this.escapeHtml(d)}</li>`).join("")}</ul>
-        </div>
-      `;
-    }
-
-    if (todos && todos.length > 0) {
-      html += `
-        <div class="stm-section">
-          <h4>TODOs</h4>
-          <ul>${todos.map((t) => `<li>${this.escapeHtml(t.text)}${t.assignee ? ` (${t.assignee})` : ""}</li>`).join("")}</ul>
-        </div>
-      `;
-    }
-
-    if (blockers && blockers.length > 0) {
-      html += `
-        <div class="stm-section stm-blockers">
-          <h4>Blockers</h4>
-          <ul>${blockers.map((b) => `<li>${this.escapeHtml(b)}</li>`).join("")}</ul>
-        </div>
-      `;
-    }
-
-    if (techNotes && techNotes.length > 0) {
-      html += `
-        <div class="stm-section">
-          <h4>Technical Notes</h4>
-          <ul>${techNotes.map((n) => `<li>${this.escapeHtml(n)}</li>`).join("")}</ul>
-        </div>
-      `;
-    }
-
-    html += `
-        </div>
-      </div>
-    `;
-
-    this.container.innerHTML = html;
+    const overview = summary.overview || "";
+    this.container.innerHTML = `<div class="stm-tooltip-text">${this.escapeHtml(overview)}</div>`;
   }
 
-  // Show error message
   showError(message) {
     if (!this.container) return;
-
-    this.container.innerHTML = `
-      <div class="stm-popup-content">
-        <div class="stm-popup-header stm-error-header">
-          <span>Error</span>
-          <button class="stm-popup-close" onclick="this.closest('.stm-popup-container').remove()">&times;</button>
-        </div>
-        <div class="stm-popup-body stm-error-body">
-          <div class="stm-error-icon">!</div>
-          <p>${this.escapeHtml(message)}</p>
-          <button class="stm-retry-button" onclick="window.STMController?.retryLastRequest()">Retry</button>
-        </div>
-      </div>
-    `;
+    this.container.innerHTML = `<div class="stm-tooltip-error">${this.escapeHtml(message)}</div>`;
   }
 
-  // Hide popup
+  scheduleHide() {
+    this.cancelHide();
+    this.hideTimeout = setTimeout(() => {
+      this.hide();
+    }, 300);
+  }
+
+  cancelHide() {
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+  }
+
   hide() {
+    this.cancelHide();
     if (this.container) {
       this.container.remove();
       this.container = null;
     }
-    document.removeEventListener("keydown", this.handleEscapeKey);
+    if (this.escapeHandler) {
+      document.removeEventListener("keydown", this.escapeHandler);
+      this.escapeHandler = null;
+    }
   }
 
-  // Escape HTML to prevent XSS
   escapeHtml(text) {
     const div = document.createElement("div");
     div.textContent = text;
@@ -280,6 +200,5 @@ class SummaryPopup {
   }
 }
 
-// Make available globally
 window.HoverUIManager = HoverUIManager;
 window.SummaryPopup = SummaryPopup;
