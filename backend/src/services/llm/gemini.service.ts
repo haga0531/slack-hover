@@ -15,7 +15,7 @@ export class GeminiService {
   constructor() {
     this.vertexAI = new VertexAI({
       project: env.GCP_PROJECT_ID,
-      location: env.GCP_REGION,
+      location: env.VERTEX_AI_REGION,
     });
     this.model = env.GEMINI_MODEL;
   }
@@ -58,8 +58,19 @@ export class GeminiService {
         language: targetLanguage,
       };
     } catch (error) {
-      logger.error({ error }, "Failed to generate summary");
-      throw new Error("Failed to generate summary");
+      logger.error(
+        {
+          error,
+          errorName: error instanceof Error ? error.name : "Unknown",
+          errorMessage: error instanceof Error ? error.message : String(error),
+          errorStack: error instanceof Error ? error.stack : undefined,
+          model: this.model,
+          project: env.GCP_PROJECT_ID,
+          vertexAiRegion: env.VERTEX_AI_REGION,
+        },
+        "Failed to generate summary"
+      );
+      throw error;
     }
   }
 }

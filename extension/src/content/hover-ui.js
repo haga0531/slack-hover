@@ -3,6 +3,8 @@
 class HoverUIManager {
   constructor(options) {
     this.onSummarizeRequest = options.onSummarizeRequest;
+    this.currentIcon = null;
+    this.currentMessage = null;
   }
 
   // Attach hover listeners to a message element
@@ -11,8 +13,8 @@ class HoverUIManager {
     if (messageElement.dataset.stmAttached) return;
     messageElement.dataset.stmAttached = "true";
 
-    messageElement.addEventListener("mouseenter", () => {
-      this.showIcon(messageElement);
+    messageElement.addEventListener("mouseenter", (e) => {
+      this.showIcon(messageElement, e);
     });
 
     messageElement.addEventListener("mouseleave", (e) => {
@@ -21,25 +23,35 @@ class HoverUIManager {
       if (relatedTarget && relatedTarget.closest(".stm-summarize-icon")) {
         return;
       }
-      this.hideIcon(messageElement);
+      this.hideIcon();
     });
   }
 
   // Show summarize icon on message
-  showIcon(messageElement) {
-    // Check if icon already exists
-    if (messageElement.querySelector(".stm-summarize-icon")) return;
+  showIcon(messageElement, event) {
+    // Remove existing icon
+    this.hideIcon();
 
     const icon = this.createSummarizeIcon(messageElement);
-    messageElement.style.position = "relative";
-    messageElement.appendChild(icon);
+    const rect = messageElement.getBoundingClientRect();
+
+    // Position icon at top-right of message
+    icon.style.position = "fixed";
+    icon.style.top = `${rect.top + 8}px`;
+    icon.style.left = `${rect.right - 40}px`;
+    icon.style.opacity = "1";
+
+    document.body.appendChild(icon);
+    this.currentIcon = icon;
+    this.currentMessage = messageElement;
   }
 
   // Hide summarize icon
-  hideIcon(messageElement) {
-    const icon = messageElement.querySelector(".stm-summarize-icon");
-    if (icon) {
-      icon.remove();
+  hideIcon() {
+    if (this.currentIcon) {
+      this.currentIcon.remove();
+      this.currentIcon = null;
+      this.currentMessage = null;
     }
   }
 
@@ -63,7 +75,7 @@ class HoverUIManager {
 
     button.addEventListener("mouseleave", () => {
       button.classList.remove("stm-icon-hover");
-      this.hideIcon(messageElement);
+      this.hideIcon();
     });
 
     return button;
@@ -104,9 +116,11 @@ class SummaryPopup {
     this.container.className = "stm-popup-container";
 
     // Close on click outside
-    document.addEventListener("click", this.handleOutsideClick.bind(this), {
-      once: true,
-    });
+    setTimeout(() => {
+      document.addEventListener("click", this.handleOutsideClick.bind(this), {
+        once: true,
+      });
+    }, 100);
 
     // Close on escape key
     document.addEventListener("keydown", this.handleEscapeKey.bind(this));

@@ -15,6 +15,7 @@ function getFirestore(): Firestore {
   if (!firestore) {
     firestore = new Firestore({
       projectId: env.GCP_PROJECT_ID,
+      ignoreUndefinedProperties: true,
     });
   }
   return firestore;

@@ -16,6 +16,7 @@ const envSchema = z.object({
   // Google Cloud
   GCP_PROJECT_ID: z.string().min(1, "GCP_PROJECT_ID is required"),
   GCP_REGION: z.string().default("asia-northeast1"),
+  VERTEX_AI_REGION: z.string().default("asia-northeast1"),
 
   // Feature Flags
   ENABLE_TRANSLATION: z
@@ -25,7 +26,7 @@ const envSchema = z.object({
   MAX_THREAD_MESSAGES: z.coerce.number().default(100),
 
   // LLM
-  GEMINI_MODEL: z.string().default("gemini-2.0-flash-exp"),
+  GEMINI_MODEL: z.string().default("gemini-2.5-pro"),
 });
 
 export type Env = z.infer<typeof envSchema>;

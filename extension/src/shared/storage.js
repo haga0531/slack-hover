@@ -1,4 +1,5 @@
 // Storage Manager for Chrome Extension
+// Uses globalThis to preserve chrome API access in content script context
 
 const DEFAULT_SETTINGS = {
   targetLanguage: "ja",
@@ -6,18 +7,29 @@ const DEFAULT_SETTINGS = {
   developerMode: false,
 };
 
+// Store chrome reference at load time (content script context)
+const chromeAPI = typeof chrome !== "undefined" ? chrome : null;
+
 const StorageManager = {
   async getSettings() {
+    if (!chromeAPI?.storage?.sync) {
+      console.warn("[STM] chrome.storage.sync not available");
+      return { ...DEFAULT_SETTINGS };
+    }
     return new Promise((resolve) => {
-      chrome.storage.sync.get(DEFAULT_SETTINGS, (result) => {
+      chromeAPI.storage.sync.get(DEFAULT_SETTINGS, (result) => {
         resolve(result);
       });
     });
   },
 
   async saveSettings(settings) {
+    if (!chromeAPI?.storage?.sync) {
+      console.warn("[STM] chrome.storage.sync not available");
+      return;
+    }
     return new Promise((resolve) => {
-      chrome.storage.sync.set(settings, () => {
+      chromeAPI.storage.sync.set(settings, () => {
         resolve();
       });
     });
@@ -29,9 +41,13 @@ const StorageManager = {
   },
 
   async getCachedSummary(channelId, threadTs) {
+    if (!chromeAPI?.storage?.local) {
+      console.warn("[STM] chrome.storage.local not available");
+      return null;
+    }
     const key = `${channelId}-${threadTs}`;
     return new Promise((resolve) => {
-      chrome.storage.local.get(["summaryCache"], (result) => {
+      chromeAPI.storage.local.get(["summaryCache"], (result) => {
         const cache = result.summaryCache || {};
         resolve(cache[key] || null);
       });
@@ -39,10 +55,14 @@ const StorageManager = {
   },
 
   async cacheSummary(channelId, threadTs, summary, language) {
+    if (!chromeAPI?.storage?.local) {
+      console.warn("[STM] chrome.storage.local not available");
+      return;
+    }
     const key = `${channelId}-${threadTs}`;
 
     return new Promise((resolve) => {
-      chrome.storage.local.get(["summaryCache"], (result) => {
+      chromeAPI.storage.local.get(["summaryCache"], (result) => {
         const cache = result.summaryCache || {};
 
         cache[key] = {
@@ -60,7 +80,7 @@ const StorageManager = {
           sortedKeys.slice(0, keys.length - 100).forEach((k) => delete cache[k]);
         }
 
-        chrome.storage.local.set({ summaryCache: cache }, () => {
+        chromeAPI.storage.local.set({ summaryCache: cache }, () => {
           resolve();
         });
       });
@@ -68,7 +88,11 @@ const StorageManager = {
   },
 
   onSettingsChange(callback) {
-    chrome.storage.onChanged.addListener((changes, area) => {
+    if (!chromeAPI?.storage?.onChanged) {
+      console.warn("[STM] chrome.storage.onChanged not available");
+      return;
+    }
+    chromeAPI.storage.onChanged.addListener((changes, area) => {
       if (area === "sync") {
         callback(changes);
       }
