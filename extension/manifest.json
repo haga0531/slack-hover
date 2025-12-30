@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "Slack Thread Summarizer",
+  "version": "1.0.0",
+  "description": "Summarize Slack threads in your preferred language with AI",
+
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+
+  "host_permissions": [
+    "https://app.slack.com/*",
+    "https://*.slack.com/*"
+  ],
+
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.slack.com/*",
+        "https://*.slack.com/*"
+      ],
+      "js": [
+        "src/shared/storage.js",
+        "src/content/slack-dom.js",
+        "src/content/hover-ui.js",
+        "src/content/content.js"
+      ],
+      "css": ["src/content/styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": false
+  },
+
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

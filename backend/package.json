@@ -1,0 +1,37 @@
+{
+  "name": "slack-thread-summarizer-backend",
+  "version": "1.0.0",
+  "description": "Backend for Slack Thread Multilingual Summarizer",
+  "main": "dist/app.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "tsx watch src/app.ts",
+    "lint": "biome check src",
+    "lint:fix": "biome check --write src",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@slack/bolt": "^4.1.0",
+    "@slack/oauth": "^3.0.0",
+    "@google/genai": "^0.21.0",
+    "@google-cloud/translate": "^8.5.0",
+    "@google-cloud/firestore": "^7.11.0",
+    "@google-cloud/secret-manager": "^5.6.0",
+    "express": "^4.21.0",
+    "zod": "^3.23.8",
+    "pino": "^9.5.0",
+    "pino-http": "^10.3.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

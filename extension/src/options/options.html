@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slack Thread Summarizer - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="stm-options">
+    <h1>Slack Thread Summarizer</h1>
+    <p class="subtitle">Configure your summarization preferences</p>
+
+    <section>
+      <h2>Language Settings</h2>
+      <label>
+        <span>Summary Language</span>
+        <select id="targetLanguage">
+          <option value="ja">Japanese (日本語)</option>
+          <option value="en">English</option>
+          <option value="zh">Chinese (中文)</option>
+          <option value="ko">Korean (한국어)</option>
+          <option value="es">Spanish (Español)</option>
+          <option value="fr">French (Français)</option>
+          <option value="de">German (Deutsch)</option>
+        </select>
+      </label>
+    </section>
+
+    <section>
+      <h2>API Settings</h2>
+      <label>
+        <span>API Endpoint</span>
+        <input type="url" id="apiEndpoint" placeholder="https://your-api.run.app">
+        <small>The URL of your deployed backend service</small>
+      </label>
+    </section>
+
+    <section>
+      <h2>Developer Options</h2>
+      <label class="checkbox-label">
+        <input type="checkbox" id="developerMode">
+        <span>Developer Mode</span>
+        <small>Show debug information in console</small>
+      </label>
+    </section>
+
+    <div class="button-group">
+      <button id="saveButton" class="primary">Save Settings</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
