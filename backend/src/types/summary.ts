@@ -41,6 +41,7 @@ export interface SummaryRequest {
 export interface SummaryResponse {
   status: "ok" | "error";
   summary?: StructuredSummary;
+  messageCount?: number;
   errorCode?: string;
   message?: string;
 }

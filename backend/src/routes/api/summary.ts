@@ -76,23 +76,18 @@ export function setupSummaryRoute(router: Router) {
         return;
       }
 
-      // Check if it's actually a thread (more than 1 message)
-      if (messages.length === 1) {
-        const response: SummaryResponse = {
-          status: "error",
-          errorCode: "NOT_A_THREAD",
-          message: "This message does not have a thread",
-        };
-        res.status(400).json(response);
-        return;
-      }
-
-      // Generate summary
+      // Generate summary or translate single message
       const geminiService = new GeminiService();
-      const summary = await geminiService.summarizeThread(
-        messages,
-        target_lang as SupportedLanguage
-      );
+      const summary =
+        messages.length === 1
+          ? await geminiService.translateMessage(
+              messages[0],
+              target_lang as SupportedLanguage
+            )
+          : await geminiService.summarizeThread(
+              messages,
+              target_lang as SupportedLanguage
+            );
 
       logger.info(
         { requestId, messageCount: messages.length },
@@ -102,6 +97,7 @@ export function setupSummaryRoute(router: Router) {
       const response: SummaryResponse = {
         status: "ok",
         summary,
+        messageCount: messages.length,
       };
 
       res.json(response);

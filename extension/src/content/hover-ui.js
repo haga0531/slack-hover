@@ -51,14 +51,13 @@ class HoverUIManager {
   createSummarizeIcon(messageElement) {
     const button = document.createElement("button");
     button.className = "stm-summarize-icon";
-    button.title = "Summarize this thread";
+    button.title = "Translate / Summarize";
+    // Globe icon with language symbol for translation/summary
     button.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-        <polyline points="14 2 14 8 20 8"></polyline>
-        <line x1="16" y1="13" x2="8" y2="13"></line>
-        <line x1="16" y1="17" x2="8" y2="17"></line>
-        <polyline points="10 9 9 9 8 9"></polyline>
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
       </svg>
     `;
 
@@ -147,13 +146,22 @@ class SummaryPopup {
     this.container.style.top = `${top}px`;
   }
 
-  showLoading() {
+  showLoading(message = "Loading...") {
     if (!this.container) return;
     this.container.innerHTML = `
       <div class="stm-tooltip-loading">
         <div class="stm-spinner"></div>
+        <span class="stm-loading-text">${this.escapeHtml(message)}</span>
       </div>
     `;
+  }
+
+  updateLoadingMessage(message) {
+    if (!this.container) return;
+    const textEl = this.container.querySelector(".stm-loading-text");
+    if (textEl) {
+      textEl.textContent = message;
+    }
   }
 
   showSummary(summary) {

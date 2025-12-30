@@ -40,7 +40,7 @@ const StorageManager = {
     return settings[key];
   },
 
-  async getCachedSummary(channelId, threadTs) {
+  async getCachedSummary(channelId, threadTs, expectedMessageCount = null) {
     if (!chromeAPI?.storage?.local) {
       console.warn("[STM] chrome.storage.local not available");
       return null;
@@ -49,12 +49,32 @@ const StorageManager = {
     return new Promise((resolve) => {
       chromeAPI.storage.local.get(["summaryCache"], (result) => {
         const cache = result.summaryCache || {};
-        resolve(cache[key] || null);
+        const entry = cache[key];
+
+        if (!entry) {
+          resolve(null);
+          return;
+        }
+
+        // If expectedMessageCount is provided, validate cache
+        if (
+          expectedMessageCount !== null &&
+          entry.messageCount !== undefined &&
+          entry.messageCount !== expectedMessageCount
+        ) {
+          console.log(
+            `[STM] Cache invalidated: message count changed from ${entry.messageCount} to ${expectedMessageCount}`
+          );
+          resolve(null);
+          return;
+        }
+
+        resolve(entry);
       });
     });
   },
 
-  async cacheSummary(channelId, threadTs, summary, language) {
+  async cacheSummary(channelId, threadTs, summary, language, messageCount = null) {
     if (!chromeAPI?.storage?.local) {
       console.warn("[STM] chrome.storage.local not available");
       return;
@@ -68,6 +88,7 @@ const StorageManager = {
         cache[key] = {
           summary,
           language,
+          messageCount,
           timestamp: Date.now(),
         };
 

@@ -85,6 +85,21 @@ const SlackDOMParser = {
     );
     return !!threadIndicator;
   },
+
+  // Get thread reply count from DOM (returns null if not visible or not a thread)
+  getReplyCount(messageElement) {
+    const threadIndicator = messageElement.querySelector(
+      '[data-qa="message_thread_reply_count"]'
+    );
+    if (!threadIndicator) {
+      return null;
+    }
+
+    // Try to extract number from text like "5 replies" or "3件の返信"
+    const text = threadIndicator.textContent || "";
+    const match = text.match(/(\d+)/);
+    return match ? parseInt(match[1], 10) : null;
+  },
 };
 
 // Message Observer using MutationObserver

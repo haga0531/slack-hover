@@ -30,6 +30,17 @@ export function buildSummaryPrompt(
 ${threadContent}`;
 }
 
+export function buildTranslationPrompt(
+  message: ThreadMessage,
+  targetLanguage: SupportedLanguage
+): string {
+  const languageName = LANGUAGE_NAMES[targetLanguage];
+
+  return `Translate this Slack message to ${languageName}. Output JSON: {"overview":"translated message"}
+
+${message.userName}: ${message.text}`;
+}
+
 export const JSON_SCHEMA = {
   type: "object",
   properties: {

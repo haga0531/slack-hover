@@ -45,10 +45,12 @@ class STMController {
 
     console.log("[STM] Summarize request:", metadata);
 
-    if (!metadata || !metadata.threadTs) {
+    // Allow both thread messages (threadTs) and single messages (messageTs)
+    const targetTs = metadata?.threadTs || metadata?.messageTs;
+    if (!metadata || !targetTs) {
       this.showPopupWithError(
         messageElement,
-        "Could not identify the thread. Please try from within a thread view."
+        "Could not identify the message. Please try again."
       );
       return;
     }
@@ -59,12 +61,21 @@ class STMController {
     // Show popup with loading state
     const rect = messageElement.getBoundingClientRect();
     this.summaryPopup.show({ x: rect.right, y: rect.top });
+    this.summaryPopup.showLoading("Checking cache...");
 
     try {
-      // Check cache first
+      // Get DOM reply count for cache validation
+      // Note: DOM reply count = thread replies, API messageCount = total messages (replies + 1)
+      const domReplyCount = window.SlackDOMParser.getReplyCount(messageElement);
+      // Convert to expected message count (add 1 for the parent message)
+      const expectedMessageCount =
+        domReplyCount !== null ? domReplyCount + 1 : null;
+
+      // Check cache first (with message count validation if available)
       const cached = await window.StorageManager.getCachedSummary(
         metadata.channelId,
-        metadata.threadTs
+        targetTs,
+        expectedMessageCount
       );
 
       if (cached && cached.language === this.settings.targetLanguage) {
@@ -73,16 +84,26 @@ class STMController {
         return;
       }
 
+      // Update progress
+      this.summaryPopup.updateLoadingMessage("Fetching thread...");
+
+      // Show translation progress after a delay
+      const translatingTimeout = setTimeout(() => {
+        this.summaryPopup.updateLoadingMessage("Translating...");
+      }, 1500);
+
       // Request summary from background script
       const response = await chrome.runtime.sendMessage({
         type: "SUMMARIZE_THREAD",
         payload: {
           channelId: metadata.channelId,
-          threadTs: metadata.threadTs,
+          threadTs: targetTs,
           teamId: metadata.teamId,
           targetLanguage: this.settings.targetLanguage,
         },
       });
+
+      clearTimeout(translatingTimeout);
 
       if (response.error) {
         throw new Error(response.error);
@@ -92,12 +113,13 @@ class STMController {
         throw new Error(response.message || "Failed to generate summary");
       }
 
-      // Cache the result
+      // Cache the result with message count for future validation
       await window.StorageManager.cacheSummary(
         metadata.channelId,
-        metadata.threadTs,
+        targetTs,
         response.summary,
-        this.settings.targetLanguage
+        this.settings.targetLanguage,
+        response.messageCount || null
       );
 
       this.summaryPopup.showSummary(response.summary);
