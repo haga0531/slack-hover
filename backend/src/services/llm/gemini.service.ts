@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { VertexAI } from "@google-cloud/vertexai";
 import { env } from "../../config/env.js";
 import { logger } from "../../middleware/logger.js";
 import type {
@@ -6,15 +6,14 @@ import type {
   SupportedLanguage,
   ThreadMessage,
 } from "../../types/summary.js";
-import { buildSummaryPrompt, JSON_SCHEMA } from "./prompts.js";
+import { buildSummaryPrompt } from "./prompts.js";
 
 export class GeminiService {
-  private client: GoogleGenAI;
+  private vertexAI: VertexAI;
   private model: string;
 
   constructor() {
-    this.client = new GoogleGenAI({
-      vertexai: true,
+    this.vertexAI = new VertexAI({
       project: env.GCP_PROJECT_ID,
       location: env.GCP_REGION,
     });
@@ -33,18 +32,18 @@ export class GeminiService {
     const prompt = buildSummaryPrompt(messages, targetLanguage);
 
     try {
-      const response = await this.client.models.generateContent({
+      const generativeModel = this.vertexAI.getGenerativeModel({
         model: this.model,
-        contents: prompt,
-        config: {
+        generationConfig: {
           responseMimeType: "application/json",
-          responseSchema: JSON_SCHEMA,
           temperature: 0.3,
           maxOutputTokens: 2048,
         },
       });
 
-      const text = response.text;
+      const result = await generativeModel.generateContent(prompt);
+      const response = result.response;
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!text) {
         throw new Error("Empty response from Gemini");

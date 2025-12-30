@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { App, ExpressReceiver, LogLevel } from "@slack/bolt";
 import { env } from "./config/env.js";
 import { createInstallationStore } from "./repositories/installation.repository.js";
@@ -52,7 +53,7 @@ async function start() {
     logger.info(`Server is running on port ${port}`);
     logger.info(`Environment: ${env.NODE_ENV}`);
   } catch (error) {
-    logger.error("Failed to start server:", error);
+    logger.error({ error }, "Failed to start server");
     process.exit(1);
   }
 }

@@ -99,7 +99,7 @@ function parseTargetLanguage(text: string): SupportedLanguage {
   return langMap[input] || "ja"; // Default to Japanese
 }
 
-function extractThreadTs(command: SlashCommand): string | null {
+function extractThreadTs(_command: SlashCommand): string | null {
   // In Slack, when a slash command is run in a thread,
   // the thread_ts is not directly available in the command payload.
   // Users need to provide a message link or use message shortcuts instead.
