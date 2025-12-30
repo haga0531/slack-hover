@@ -1,0 +1,14 @@
+{
+  "name": "slack-thread-summarizer-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for Slack Thread Summarizer",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.9",
+    "jsdom": "^25.0.1"
+  }
+}

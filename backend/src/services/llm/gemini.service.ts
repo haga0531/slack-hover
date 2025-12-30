@@ -8,16 +8,35 @@ import type {
 } from "../../types/summary.js";
 import { buildSummaryPrompt, buildTranslationPrompt } from "./prompts.js";
 
+export interface GeminiServiceConfig {
+  projectId: string;
+  location: string;
+  model: string;
+}
+
+export interface GeminiServiceDeps {
+  vertexAI?: VertexAI;
+  config?: GeminiServiceConfig;
+}
+
 export class GeminiService {
   private vertexAI: VertexAI;
   private model: string;
 
-  constructor() {
-    this.vertexAI = new VertexAI({
-      project: env.GCP_PROJECT_ID,
+  constructor(deps?: GeminiServiceDeps) {
+    const config = deps?.config ?? {
+      projectId: env.GCP_PROJECT_ID,
       location: env.VERTEX_AI_REGION,
-    });
-    this.model = env.GEMINI_MODEL;
+      model: env.GEMINI_MODEL,
+    };
+
+    this.vertexAI =
+      deps?.vertexAI ??
+      new VertexAI({
+        project: config.projectId,
+        location: config.location,
+      });
+    this.model = config.model;
   }
 
   async summarizeThread(
