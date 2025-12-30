@@ -170,48 +170,4 @@ describe("ThreadService", () => {
     });
   });
 
-  describe("checkThreadExists", () => {
-    it("should return true when thread has multiple messages", async () => {
-      mockConversationsReplies.mockResolvedValue({
-        messages: [
-          { text: "Parent", ts: "1234567890.000000" },
-          { text: "Reply", ts: "1234567890.000001" },
-        ],
-      });
-
-      const service = new ThreadService(mockClient);
-      const exists = await service.checkThreadExists("C123", "1234567890.000000");
-
-      expect(exists).toBe(true);
-    });
-
-    it("should return false when thread has only one message", async () => {
-      mockConversationsReplies.mockResolvedValue({
-        messages: [{ text: "Parent", ts: "1234567890.000000" }],
-      });
-
-      const service = new ThreadService(mockClient);
-      const exists = await service.checkThreadExists("C123", "1234567890.000000");
-
-      expect(exists).toBe(false);
-    });
-
-    it("should return false when API call fails", async () => {
-      mockConversationsReplies.mockRejectedValue(new Error("API Error"));
-
-      const service = new ThreadService(mockClient);
-      const exists = await service.checkThreadExists("C123", "1234567890.000000");
-
-      expect(exists).toBe(false);
-    });
-
-    it("should return false when messages is undefined", async () => {
-      mockConversationsReplies.mockResolvedValue({});
-
-      const service = new ThreadService(mockClient);
-      const exists = await service.checkThreadExists("C123", "1234567890.000000");
-
-      expect(exists).toBe(false);
-    });
-  });
 });

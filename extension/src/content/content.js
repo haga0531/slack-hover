@@ -6,7 +6,6 @@ class STMController {
     this.messageObserver = null;
     this.hoverUI = null;
     this.summaryPopup = null;
-    this.lastRequest = null;
   }
 
   async initialize() {
@@ -47,9 +46,6 @@ class STMController {
       );
       return;
     }
-
-    // Store for retry
-    this.lastRequest = { messageElement, metadata };
 
     // Show popup with loading state
     const rect = messageElement.getBoundingClientRect();
@@ -124,12 +120,6 @@ class STMController {
     const rect = messageElement.getBoundingClientRect();
     this.summaryPopup.show({ x: rect.right, y: rect.top });
     this.summaryPopup.showError(message);
-  }
-
-  async retryLastRequest() {
-    if (this.lastRequest) {
-      await this.handleSummarizeRequest(this.lastRequest.messageElement);
-    }
   }
 
   onSettingsChange(changes) {

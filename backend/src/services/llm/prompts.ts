@@ -40,36 +40,3 @@ export function buildTranslationPrompt(
 
 ${message.userName}: ${message.text}`;
 }
-
-export const JSON_SCHEMA = {
-  type: "object",
-  properties: {
-    title: { type: "string" },
-    overview: { type: "string" },
-    decisions: {
-      type: "array",
-      items: { type: "string" },
-    },
-    todos: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          text: { type: "string" },
-          assignee: { type: ["string", "null"] },
-          due: { type: ["string", "null"] },
-        },
-        required: ["text"],
-      },
-    },
-    blockers: {
-      type: "array",
-      items: { type: "string" },
-    },
-    techNotes: {
-      type: "array",
-      items: { type: "string" },
-    },
-  },
-  required: ["title", "overview", "decisions", "todos", "blockers", "techNotes"],
-};

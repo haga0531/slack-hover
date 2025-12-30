@@ -77,15 +77,6 @@ const SlackDOMParser = {
     return document.querySelectorAll(SELECTORS.MESSAGE_CONTAINER);
   },
 
-  // Check if element has thread replies indicator
-  hasThreadReplies(messageElement) {
-    // Look for thread reply count indicator
-    const threadIndicator = messageElement.querySelector(
-      '[data-qa="message_thread_reply_count"]'
-    );
-    return !!threadIndicator;
-  },
-
   // Get thread reply count from DOM (returns null if not visible or not a thread)
   getReplyCount(messageElement) {
     const threadIndicator = messageElement.querySelector(
@@ -187,4 +178,3 @@ class SlackMessageObserver {
 // Make available globally
 window.SlackDOMParser = SlackDOMParser;
 window.SlackMessageObserver = SlackMessageObserver;
-window.SLACK_SELECTORS = SELECTORS;

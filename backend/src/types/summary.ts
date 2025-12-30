@@ -31,13 +31,6 @@ export interface ThreadMessage {
   threadTs?: string;
 }
 
-export interface SummaryRequest {
-  channelId: string;
-  threadTs: string;
-  userId?: string;
-  targetLanguage?: SupportedLanguage;
-}
-
 export interface SummaryResponse {
   status: "ok" | "error";
   summary?: StructuredSummary;

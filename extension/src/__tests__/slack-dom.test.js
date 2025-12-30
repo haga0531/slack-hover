@@ -136,27 +136,6 @@ describe("SlackDOMParser", () => {
     });
   });
 
-  describe("hasThreadReplies", () => {
-    it("should return true when thread reply indicator exists", () => {
-      const mockElement = document.createElement("div");
-      const indicator = document.createElement("span");
-      indicator.setAttribute("data-qa", "message_thread_reply_count");
-      mockElement.appendChild(indicator);
-
-      const result = SlackDOMParser.hasThreadReplies(mockElement);
-
-      expect(result).toBe(true);
-    });
-
-    it("should return false when no thread reply indicator", () => {
-      const mockElement = document.createElement("div");
-
-      const result = SlackDOMParser.hasThreadReplies(mockElement);
-
-      expect(result).toBe(false);
-    });
-  });
-
   describe("getReplyCount", () => {
     it("should extract reply count from indicator text", () => {
       const mockElement = document.createElement("div");

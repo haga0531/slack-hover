@@ -77,20 +77,4 @@ export class ThreadService {
     return userId;
   }
 
-  async checkThreadExists(
-    channelId: string,
-    messageTs: string
-  ): Promise<boolean> {
-    try {
-      const result = await this.client.conversations.replies({
-        channel: channelId,
-        ts: messageTs,
-        limit: 1,
-      });
-
-      return (result.messages?.length || 0) > 1;
-    } catch {
-      return false;
-    }
-  }
 }
