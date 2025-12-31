@@ -53,7 +53,7 @@
 </head>
 <body>
   <h1>Privacy Policy</h1>
-  <p class="last-updated">Last updated: December 31, 2024</p>
+  <p class="last-updated">Last updated: December 31, 2025</p>
 
   <p>This Privacy Policy describes how Slack Thread Summarizer ("the Extension") collects, uses, and handles your information.</p>
 
@@ -86,9 +86,20 @@
 
   <h2>Data Storage</h2>
   <ul>
-    <li><strong>Local Storage Only:</strong> Your language preferences and cached summaries are stored only in your browser's local storage.</li>
-    <li><strong>No Server-Side Storage:</strong> We do not store your Slack messages or thread content on our servers.</li>
-    <li><strong>Cache Management:</strong> Local cache is automatically limited to 100 entries and can be cleared by removing the extension.</li>
+    <li><strong>Local Storage:</strong> Your language preferences and cached summaries are stored in your browser's local storage (30-day expiry).</li>
+    <li><strong>Server-Side Cache:</strong> Generated summaries are cached on our server for up to 90 days to improve performance for your workspace. Only the AI-generated summary is stored, not the original Slack messages.</li>
+    <li><strong>Slack Integration:</strong> OAuth tokens for workspace authentication are securely stored on our server.</li>
+    <li><strong>Cache Management:</strong> Local cache is limited to 100 entries. Server cache automatically expires after 90 days.</li>
+  </ul>
+
+  <h2>Workspace Isolation</h2>
+  <div class="highlight">
+    <p><strong>Your data is strictly isolated by workspace.</strong></p>
+  </div>
+  <ul>
+    <li><strong>No cross-workspace access:</strong> Cached summaries are accessible only within the same Slack workspace. Users from other workspaces cannot access your workspace's data.</li>
+    <li><strong>Slack API validation:</strong> Every request is validated through Slack's API to ensure the user has permission to access the requested thread.</li>
+    <li><strong>Workspace-scoped cache keys:</strong> All cached data is keyed by workspace ID, ensuring complete separation between organizations.</li>
   </ul>
 
   <h2>Third-Party Services</h2>
