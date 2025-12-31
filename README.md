@@ -19,7 +19,8 @@ Summarize Slack threads in your preferred language with AI.
 ```
 slack-hover/
 ├── backend/          # Node.js + Slack Bolt backend
-└── extension/        # Chrome extension (Manifest V3)
+├── extension/        # Chrome extension (Manifest V3)
+└── infrastructure/   # Terraform IaC
 ```
 
 ## Tech Stack
@@ -29,6 +30,7 @@ slack-hover/
 - **LLM**: Vertex AI (Gemini)
 - **Data Store**: Firestore
 - **Browser Extension**: Chrome Extension (Manifest V3)
+- **Infrastructure**: Terraform
 
 ## Getting Started
 
@@ -91,7 +93,13 @@ slack-hover/
 
 ## Deployment
 
-### Cloud Run
+### CI/CD (GitHub Actions)
+
+Pushing to `main` branch automatically:
+1. Runs tests (backend + extension)
+2. Deploys to Cloud Run (if backend/ changed)
+
+### Manual Deployment
 
 ```bash
 cd backend
@@ -105,6 +113,36 @@ gcloud run deploy stm-backend \
 
 1. Create a ZIP of the extension directory
 2. Upload to Chrome Web Store Developer Dashboard
+
+## Infrastructure (Terraform)
+
+GCP infrastructure is managed with Terraform.
+
+### Setup
+
+```bash
+cd infrastructure
+terraform init
+```
+
+### Preview Changes
+
+```bash
+terraform plan
+```
+
+### Apply Changes
+
+```bash
+terraform apply
+```
+
+### Managed Resources
+
+- GCP APIs (Cloud Run, Firestore, Vertex AI, etc.)
+- Firestore Database
+- Cloud Run Service
+- IAM Policies
 
 ## License
 
