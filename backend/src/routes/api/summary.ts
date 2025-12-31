@@ -78,6 +78,19 @@ export function setupSummaryRoute(router: Router) {
 
       const currentMessageCount = messages.length;
 
+      // Debug: Log message content
+      logger.info(
+        {
+          requestId,
+          messages: messages.map((m) => ({
+            userName: m.userName,
+            text: m.text,
+            textLength: m.text.length,
+          })),
+        },
+        "Fetched thread messages"
+      );
+
       // Check cache first (with message count validation)
       const cached = await CacheRepository.get(
         team_id,
