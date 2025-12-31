@@ -110,15 +110,29 @@ const SlackDOMParser = {
   },
 };
 
-// Message Observer using MutationObserver
+// Message Observer using MutationObserver + Periodic Scan
 class SlackMessageObserver {
   constructor(callbacks) {
     this.callbacks = callbacks;
     this.observer = null;
-    this.processedMessages = new WeakSet();
+    this.scanInterval = null;
+    this.processedKeys = new Set(); // Track by data-item-key instead of WeakSet
   }
 
   start() {
+    // Start mutation observer
+    this.startMutationObserver();
+
+    // Start periodic scan as fallback (every 1 second)
+    this.scanInterval = setInterval(() => {
+      this.scanForNewMessages();
+    }, 1000);
+
+    // Also scan on scroll (debounced)
+    this.setupScrollListener();
+  }
+
+  startMutationObserver() {
     this.waitForContainer().then((container) => {
       this.observer = new MutationObserver((mutations) => {
         this.handleMutations(mutations);
@@ -127,11 +141,44 @@ class SlackMessageObserver {
       this.observer.observe(container, {
         childList: true,
         subtree: true,
+        attributes: true,
+        attributeFilter: ['data-item-key'],
       });
 
       // Process existing messages
-      this.processExistingMessages();
+      this.scanForNewMessages();
     });
+  }
+
+  setupScrollListener() {
+    let scrollTimeout = null;
+
+    const handleScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        this.scanForNewMessages();
+      }, 200);
+    };
+
+    // Watch for scroll containers being added
+    const attachScrollListener = () => {
+      const containers = document.querySelectorAll(SELECTORS.SCROLL_CONTAINER);
+      containers.forEach(container => {
+        if (!container.dataset.stmScrollAttached) {
+          container.dataset.stmScrollAttached = 'true';
+          container.addEventListener('scroll', handleScroll, { passive: true });
+        }
+      });
+    };
+
+    // Initial attachment
+    attachScrollListener();
+
+    // Re-attach when DOM changes (for SPA navigation)
+    const bodyObserver = new MutationObserver(() => {
+      attachScrollListener();
+    });
+    bodyObserver.observe(document.body, { childList: true, subtree: true });
   }
 
   async waitForContainer() {
@@ -172,18 +219,24 @@ class SlackMessageObserver {
   }
 
   processMessage(messageElement) {
-    if (this.processedMessages.has(messageElement)) return;
-    this.processedMessages.add(messageElement);
+    const itemKey = messageElement.getAttribute('data-item-key');
+    if (!itemKey) return;
+
+    // Skip if already processed
+    if (this.processedKeys.has(itemKey)) return;
 
     // Only process valid messages (not channel headers or other items)
     if (!SlackDOMParser.isValidMessage(messageElement)) return;
+
+    // Mark as processed
+    this.processedKeys.add(itemKey);
 
     if (this.callbacks.onNewMessage) {
       this.callbacks.onNewMessage(messageElement);
     }
   }
 
-  processExistingMessages() {
+  scanForNewMessages() {
     const messages = SlackDOMParser.getAllMessages();
     messages.forEach((msg) => this.processMessage(msg));
   }
@@ -191,6 +244,9 @@ class SlackMessageObserver {
   stop() {
     if (this.observer) {
       this.observer.disconnect();
+    }
+    if (this.scanInterval) {
+      clearInterval(this.scanInterval);
     }
   }
 }
