@@ -4,6 +4,7 @@ import { WebClient } from "@slack/web-api";
 import { Firestore } from "@google-cloud/firestore";
 import { ThreadService } from "../../services/slack/thread.service.js";
 import { GeminiService } from "../../services/llm/gemini.service.js";
+import { CacheRepository } from "../../repositories/cache.repository.js";
 import { logger } from "../../middleware/logger.js";
 import { env } from "../../config/env.js";
 import type { SummaryResponse, SupportedLanguage } from "../../types/summary.js";
@@ -42,7 +43,7 @@ export function setupSummaryRoute(router: Router) {
 
       const { channel_id, thread_ts, target_lang, team_id } = parseResult.data;
 
-      // Get Slack token from Firestore
+      // Get Slack token from Firestore (validates workspace access)
       const token = await getSlackToken(team_id);
 
       if (!token) {
@@ -55,11 +56,11 @@ export function setupSummaryRoute(router: Router) {
         return;
       }
 
-      // Create Slack client
+      // Create Slack client to get current message count
       const slackClient = new WebClient(token);
-
-      // Fetch thread messages
       const threadService = new ThreadService(slackClient);
+
+      // Fetch thread messages to get current count
       const messages = await threadService.fetchThreadMessages(
         channel_id,
         thread_ts
@@ -75,6 +76,39 @@ export function setupSummaryRoute(router: Router) {
         return;
       }
 
+      const currentMessageCount = messages.length;
+
+      // Check cache first (with message count validation)
+      const cached = await CacheRepository.get(
+        team_id,
+        channel_id,
+        thread_ts,
+        target_lang as SupportedLanguage,
+        currentMessageCount
+      );
+
+      if (cached) {
+        logger.info(
+          { requestId, team_id, channel_id, thread_ts, target_lang },
+          "Returning cached summary"
+        );
+
+        const response: SummaryResponse = {
+          status: "ok",
+          summary: cached.summary,
+          messageCount: cached.messageCount,
+        };
+
+        res.json(response);
+        return;
+      }
+
+      // Cache miss - generate new summary
+      logger.info(
+        { requestId, team_id, channel_id, thread_ts, target_lang, messageCount: currentMessageCount },
+        "Generating new summary"
+      );
+
       // Generate summary or translate single message
       const geminiService = new GeminiService();
       const summary =
@@ -88,10 +122,22 @@ export function setupSummaryRoute(router: Router) {
               target_lang as SupportedLanguage
             );
 
+      // Store in cache (async, don't wait)
+      CacheRepository.set(
+        team_id,
+        channel_id,
+        thread_ts,
+        target_lang as SupportedLanguage,
+        summary,
+        currentMessageCount
+      ).catch((error) => {
+        logger.error({ requestId, error }, "Failed to cache summary");
+      });
+
       const response: SummaryResponse = {
         status: "ok",
         summary,
-        messageCount: messages.length,
+        messageCount: currentMessageCount,
       };
 
       res.json(response);
