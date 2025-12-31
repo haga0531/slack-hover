@@ -3,6 +3,7 @@
 const SELECTORS = {
   MESSAGE_CONTAINER: '.c-virtual_list__item[data-item-key]',
   MESSAGE_TEXT: '[data-qa="message-text"]',
+  MESSAGE_CONTENT: '.c-message_kit__message',
   SCROLL_CONTAINER: '.c-virtual_list__scroll_container',
   WORKSPACE_VIEW: '.p-workspace__primary_view_contents',
   MESSAGE_ACTIONS: '.c-message__actions',
@@ -75,6 +76,22 @@ const SlackDOMParser = {
   // Get all message elements
   getAllMessages() {
     return document.querySelectorAll(SELECTORS.MESSAGE_CONTAINER);
+  },
+
+  // Check if an element is actually a message (not a channel header or other item)
+  isValidMessage(element) {
+    // Must have a data-item-key with timestamp format (e.g., "1234567890.123456")
+    const itemKey = element.getAttribute("data-item-key");
+    if (!itemKey) return false;
+
+    // Check if itemKey contains a valid Slack timestamp
+    const hasTimestamp = /\d+\.\d+/.test(itemKey);
+    if (!hasTimestamp) return false;
+
+    // Must contain actual message content
+    const hasMessageContent = element.querySelector(SELECTORS.MESSAGE_CONTENT) !== null;
+
+    return hasMessageContent;
   },
 
   // Get thread reply count from DOM (returns null if not visible or not a thread)
@@ -157,6 +174,9 @@ class SlackMessageObserver {
   processMessage(messageElement) {
     if (this.processedMessages.has(messageElement)) return;
     this.processedMessages.add(messageElement);
+
+    // Only process valid messages (not channel headers or other items)
+    if (!SlackDOMParser.isValidMessage(messageElement)) return;
 
     if (this.callbacks.onNewMessage) {
       this.callbacks.onNewMessage(messageElement);
