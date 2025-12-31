@@ -16,48 +16,48 @@ resource "google_cloud_run_v2_service" "backend" {
       }
 
       env {
-        name  = "PORT"
-        value = "8080"
-      }
-
-      env {
         name  = "GCP_PROJECT_ID"
         value = var.project_id
       }
 
       env {
-        name  = "GCP_REGION"
-        value = var.region
+        name = "SLACK_CLIENT_ID"
+        value_source {
+          secret_key_ref {
+            secret  = "slack-client-id"
+            version = "latest"
+          }
+        }
       }
 
       env {
-        name  = "GEMINI_MODEL"
-        value = var.gemini_model
+        name = "SLACK_CLIENT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "slack-client-secret"
+            version = "latest"
+          }
+        }
       }
 
       env {
-        name  = "SLACK_CLIENT_ID"
-        value = var.slack_client_id
+        name = "SLACK_SIGNING_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "slack-signing-secret"
+            version = "latest"
+          }
+        }
       }
 
       env {
-        name  = "SLACK_CLIENT_SECRET"
-        value = var.slack_client_secret
-      }
-
-      env {
-        name  = "SLACK_SIGNING_SECRET"
-        value = var.slack_signing_secret
-      }
-
-      env {
-        name  = "SLACK_STATE_SECRET"
-        value = var.slack_state_secret
-      }
-
-      env {
-        name  = "MAX_THREAD_MESSAGES"
-        value = "100"
+        name = "SLACK_STATE_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "slack-state-secret"
+            version = "latest"
+          }
+        }
       }
 
       resources {
@@ -65,6 +65,8 @@ resource "google_cloud_run_v2_service" "backend" {
           cpu    = "1"
           memory = "512Mi"
         }
+        cpu_idle          = true
+        startup_cpu_boost = true
       }
     }
 

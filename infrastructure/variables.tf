@@ -20,30 +20,6 @@ variable "container_image" {
   type        = string
 }
 
-variable "slack_client_id" {
-  description = "Slack OAuth Client ID"
-  type        = string
-  sensitive   = true
-}
-
-variable "slack_client_secret" {
-  description = "Slack OAuth Client Secret"
-  type        = string
-  sensitive   = true
-}
-
-variable "slack_signing_secret" {
-  description = "Slack Signing Secret"
-  type        = string
-  sensitive   = true
-}
-
-variable "slack_state_secret" {
-  description = "Slack OAuth State Secret"
-  type        = string
-  sensitive   = true
-}
-
 variable "gemini_model" {
   description = "Gemini model name"
   type        = string
