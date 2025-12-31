@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "backend/**"
+  workflow_dispatch:
 
 env:
   PROJECT_ID: slack-hover-202512
