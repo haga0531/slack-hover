@@ -48,5 +48,5 @@ export function buildTranslationPrompt(
 
 Output as JSON: {"overview": "translated message"}
 
-${message.userName}: ${message.text}`;
+${message.text}`;
 }

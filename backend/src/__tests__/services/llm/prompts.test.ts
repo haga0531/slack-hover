@@ -94,7 +94,6 @@ describe("buildTranslationPrompt", () => {
     const prompt = buildTranslationPrompt(mockMessage, "en");
     expect(prompt).toContain("Translate");
     expect(prompt).toContain("English");
-    expect(prompt).toContain("Alice:");
     expect(prompt).toContain("これは日本語のメッセージです");
     expect(prompt).toContain('{"overview"');
   });
@@ -104,9 +103,9 @@ describe("buildTranslationPrompt", () => {
     expect(prompt).toContain("Japanese");
   });
 
-  it("should include userName and text in the prompt", () => {
+  it("should include text in the prompt", () => {
     const prompt = buildTranslationPrompt(mockMessage, "en");
-    expect(prompt).toContain("Alice:");
     expect(prompt).toContain("これは日本語のメッセージです");
+    expect(prompt).not.toContain("Alice");
   });
 });

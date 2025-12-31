@@ -44,12 +44,27 @@ export class ThreadService {
     const messages: ThreadMessage[] = validMessages.map((msg) => ({
       userId: msg.user || "unknown",
       userName: msg.user ? this.userCache.get(msg.user) || msg.user : "Unknown",
-      text: msg.text!,
+      text: this.cleanSlackText(msg.text!),
       timestamp: msg.ts!,
       threadTs: msg.thread_ts,
     }));
 
     return messages;
+  }
+
+  /**
+   * Clean Slack message text by converting link format to display text only
+   * <URL|display_text> → display_text
+   * <URL> → (removed)
+   */
+  private cleanSlackText(text: string): string {
+    // Replace <URL|display_text> with display_text
+    let cleaned = text.replace(/<([^|>]+)\|([^>]+)>/g, "$2");
+
+    // Remove <URL> (links without display text)
+    cleaned = cleaned.replace(/<(https?:\/\/[^>]+)>/g, "");
+
+    return cleaned.trim();
   }
 
   private async resolveUserName(userId: string): Promise<string> {
