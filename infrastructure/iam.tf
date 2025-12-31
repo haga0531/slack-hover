@@ -88,3 +88,10 @@ resource "google_project_iam_member" "github_actions_artifact_registry" {
   role    = "roles/artifactregistry.writer"
   member  = "serviceAccount:${google_service_account.github_actions.email}"
 }
+
+# Grant Service Usage Consumer for Cloud Run deploy
+resource "google_project_iam_member" "github_actions_service_usage" {
+  project = var.project_id
+  role    = "roles/serviceusage.serviceUsageConsumer"
+  member  = "serviceAccount:${google_service_account.github_actions.email}"
+}
