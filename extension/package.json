@@ -2,6 +2,16 @@
   "name": "slack-thread-summarizer-extension",
   "version": "1.0.0",
   "description": "Chrome extension for Slack Thread Summarizer",
+  "author": "haga0531",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/haga0531/slack-hover.git"
+  },
+  "bugs": {
+    "url": "https://github.com/haga0531/slack-hover/issues"
+  },
+  "homepage": "https://github.com/haga0531/slack-hover#readme",
   "type": "module",
   "scripts": {
     "test": "vitest --run",

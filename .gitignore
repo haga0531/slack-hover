@@ -36,3 +36,6 @@ infrastructure/.terraform/
 infrastructure/*.tfstate
 infrastructure/*.tfstate.*
 infrastructure/terraform.tfvars
+
+# Claude Code
+.claude/

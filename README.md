@@ -1,5 +1,9 @@
 # Slack Thread Multilingual Summarizer (STM)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/haga0531/slack-hover/actions/workflows/test.yml/badge.svg)](https://github.com/haga0531/slack-hover/actions/workflows/test.yml)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-green.svg)](https://nodejs.org/)
+
 Summarize Slack threads in your preferred language with AI.
 
 ## Features

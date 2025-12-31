@@ -2,6 +2,16 @@
   "name": "slack-thread-summarizer-backend",
   "version": "1.1.0",
   "description": "Backend for Slack Thread Multilingual Summarizer",
+  "author": "haga0531",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/haga0531/slack-hover.git"
+  },
+  "bugs": {
+    "url": "https://github.com/haga0531/slack-hover/issues"
+  },
+  "homepage": "https://github.com/haga0531/slack-hover#readme",
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",
