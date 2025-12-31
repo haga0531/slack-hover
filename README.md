@@ -15,6 +15,19 @@ Summarize Slack threads in your preferred language with AI.
 - Privacy-focused: No one knows when you request a summary (unlike Slack's translation stamps)
 - Workspace-shared cache for faster responses
 
+## Usage
+
+1. Hover over any Slack message to see the summarize icon
+2. Click the icon to get an AI-generated summary in your preferred language
+
+### Japanese Summary
+
+![Japanese Summary](extension/icons/jp.png)
+
+### English Summary
+
+![English Summary](extension/icons/english.png)
+
 ## Security & Privacy
 
 - **Workspace Isolation**: All cached data is strictly isolated by Slack workspace ID
