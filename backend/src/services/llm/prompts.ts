@@ -25,8 +25,21 @@ export function buildSummaryPrompt(
     .map((m) => `${m.userName}: ${m.text}`)
     .join("\n");
 
-  return `Summarize this Slack thread in ${languageName}. Output JSON: {"overview":"2-3 sentence summary"}
+  return `You are summarizing a Slack thread for a user who may not speak the original language.
+Provide a comprehensive summary in ${languageName}.
 
+Your summary should include:
+- Main topic and context of the discussion
+- Key points and arguments made by participants
+- Any decisions that were made
+- Action items or next steps (if mentioned)
+- Unresolved questions or blockers (if any)
+
+The summary should be detailed enough (5-10 sentences) that the reader fully understands what was discussed without reading the original thread.
+
+Output as JSON: {"overview": "your detailed summary here"}
+
+Thread:
 ${threadContent}`;
 }
 
@@ -36,7 +49,12 @@ export function buildTranslationPrompt(
 ): string {
   const languageName = LANGUAGE_NAMES[targetLanguage];
 
-  return `Translate this Slack message to ${languageName}. Output JSON: {"overview":"translated message"}
+  return `Translate this Slack message to ${languageName}.
+Preserve the original tone, meaning, and any formatting.
+If there are cultural references, idioms, or technical terms that might be unclear, add brief clarifying notes in parentheses.
 
-${message.userName}: ${message.text}`;
+Output as JSON: {"overview": "your full translation here"}
+
+Message from ${message.userName}:
+${message.text}`;
 }
