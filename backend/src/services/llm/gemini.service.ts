@@ -51,23 +51,25 @@ export class GeminiService {
         generationConfig: {
           responseMimeType: "application/json",
           temperature: 0.2,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2048,
         },
       });
 
       const result = await generativeModel.generateContent(prompt);
       const response = result.response;
-      const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+      const candidate = response.candidates?.[0];
+      const text = candidate?.content?.parts?.[0]?.text;
 
       if (!text) {
         logger.error(
           {
             candidates: JSON.stringify(response.candidates),
             promptFeedback: JSON.stringify(response.promptFeedback),
+            finishReason: candidate?.finishReason,
           },
           "Empty response from Gemini"
         );
-        throw new Error("Empty response from Gemini");
+        throw new Error(`Empty response from Gemini: ${candidate?.finishReason || "unknown"}`);
       }
 
       const parsed = JSON.parse(text) as Omit<StructuredSummary, "language">;
@@ -105,24 +107,25 @@ export class GeminiService {
         generationConfig: {
           responseMimeType: "application/json",
           temperature: 0.2,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2048,
         },
       });
 
       const result = await generativeModel.generateContent(prompt);
       const response = result.response;
-
-      const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+      const candidate = response.candidates?.[0];
+      const text = candidate?.content?.parts?.[0]?.text;
 
       if (!text) {
         logger.error(
           {
             candidates: JSON.stringify(response.candidates),
             promptFeedback: JSON.stringify(response.promptFeedback),
+            finishReason: candidate?.finishReason,
           },
           "Empty response from Gemini (translate)"
         );
-        throw new Error("Empty response from Gemini");
+        throw new Error(`Empty response from Gemini: ${candidate?.finishReason || "unknown"}`);
       }
 
       const parsed = JSON.parse(text) as Omit<StructuredSummary, "language">;
