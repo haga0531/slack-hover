@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Slack Thread Summarizer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      color: #1d1c1d;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .last-updated {
+      color: #616061;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+    h2 {
+      font-size: 20px;
+      margin-top: 32px;
+      margin-bottom: 16px;
+      color: #1d1c1d;
+    }
+    p, ul {
+      margin-bottom: 16px;
+    }
+    ul {
+      padding-left: 24px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .highlight {
+      background: #f4f4f5;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    a {
+      color: #1264a3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p class="last-updated">Last updated: December 31, 2024</p>
+
+  <p>This Privacy Policy describes how Slack Thread Summarizer ("the Extension") collects, uses, and handles your information.</p>
+
+  <h2>Information We Collect</h2>
+  <p>The Extension collects the following information:</p>
+  <ul>
+    <li><strong>Slack Thread Content:</strong> When you request a summary, the Extension reads the content of the Slack thread you are viewing, including message text and usernames.</li>
+    <li><strong>Language Preference:</strong> Your selected summary language preference is stored locally in your browser.</li>
+    <li><strong>Summary Cache:</strong> Generated summaries are cached locally in your browser for performance.</li>
+  </ul>
+
+  <h2>How We Use Your Information</h2>
+  <p>The collected information is used solely for:</p>
+  <ul>
+    <li>Generating AI-powered summaries of Slack threads</li>
+    <li>Displaying summaries in your preferred language</li>
+    <li>Improving response times through local caching</li>
+  </ul>
+
+  <h2>Data Processing</h2>
+  <div class="highlight">
+    <p><strong>Important:</strong> To generate summaries, Slack thread content is sent to our backend server, which uses Google Vertex AI (Gemini) to process and summarize the text. This means your Slack messages are temporarily processed by Google's AI services.</p>
+  </div>
+  <ul>
+    <li>Thread content is sent to our secure backend server via HTTPS</li>
+    <li>Our server forwards the content to Google Vertex AI for summarization</li>
+    <li>The generated summary is returned to your browser</li>
+    <li>No thread content is permanently stored on our servers</li>
+  </ul>
+
+  <h2>Data Storage</h2>
+  <ul>
+    <li><strong>Local Storage Only:</strong> Your language preferences and cached summaries are stored only in your browser's local storage.</li>
+    <li><strong>No Server-Side Storage:</strong> We do not store your Slack messages or thread content on our servers.</li>
+    <li><strong>Cache Management:</strong> Local cache is automatically limited to 100 entries and can be cleared by removing the extension.</li>
+  </ul>
+
+  <h2>Third-Party Services</h2>
+  <p>The Extension uses the following third-party services:</p>
+  <ul>
+    <li><strong>Google Vertex AI (Gemini):</strong> Used to generate AI summaries. Google's privacy policy applies to data processed by their services. <a href="https://cloud.google.com/terms/cloud-privacy-notice" target="_blank">Google Cloud Privacy Notice</a></li>
+    <li><strong>Google Cloud Run:</strong> Hosts our backend server that processes summarization requests.</li>
+  </ul>
+
+  <h2>Data Security</h2>
+  <ul>
+    <li>All communications use HTTPS encryption</li>
+    <li>No authentication tokens or credentials are collected</li>
+    <li>Thread content is processed transiently and not logged</li>
+  </ul>
+
+  <h2>Your Rights</h2>
+  <p>You have the right to:</p>
+  <ul>
+    <li>Stop using the Extension at any time by removing it from Chrome</li>
+    <li>Clear local storage data through Chrome's settings</li>
+    <li>Choose which threads to summarize (the Extension only processes threads when you explicitly request a summary)</li>
+  </ul>
+
+  <h2>Children's Privacy</h2>
+  <p>This Extension is not intended for use by children under 13 years of age.</p>
+
+  <h2>Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last updated" date at the top of this policy.</p>
+
+  <h2>Contact Us</h2>
+  <p>If you have any questions about this Privacy Policy, please contact us through the Chrome Web Store listing.</p>
+</body>
+</html>

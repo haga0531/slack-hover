@@ -2,8 +2,6 @@
 
 const DEFAULT_SETTINGS = {
   targetLanguage: "ja",
-  apiEndpoint: "",
-  developerMode: false,
 };
 
 // Load settings
@@ -11,17 +9,6 @@ async function loadSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get(DEFAULT_SETTINGS, (result) => {
       document.getElementById("targetLanguage").value = result.targetLanguage;
-
-      // Update status indicator
-      const indicator = document.getElementById("statusIndicator");
-      if (result.apiEndpoint) {
-        indicator.classList.remove("disconnected");
-        indicator.title = "Connected to API";
-      } else {
-        indicator.classList.add("disconnected");
-        indicator.title = "API endpoint not configured";
-      }
-
       resolve();
     });
   });

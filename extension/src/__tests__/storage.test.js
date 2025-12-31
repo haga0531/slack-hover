@@ -34,8 +34,7 @@ describe("StorageManager", () => {
 
       expect(settings).toEqual({
         targetLanguage: "ja",
-        apiEndpoint: "",
-        developerMode: false,
+        apiEndpoint: "https://stm-backend-sxbj32ez6q-an.a.run.app",
       });
     });
 
@@ -57,8 +56,7 @@ describe("StorageManager", () => {
 
       expect(settings).toEqual({
         targetLanguage: "ja",
-        apiEndpoint: "",
-        developerMode: false,
+        apiEndpoint: "https://stm-backend-sxbj32ez6q-an.a.run.app",
       });
 
       global.chrome.storage.sync = originalSync;

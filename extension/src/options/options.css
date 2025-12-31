@@ -162,3 +162,19 @@ button.primary:active {
   background: #fce4ec;
   color: #c62828;
 }
+
+.footer {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.footer a {
+  color: #616061;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: #1264a3;
+  text-decoration: underline;
+}

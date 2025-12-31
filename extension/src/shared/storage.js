@@ -3,8 +3,7 @@
 
 const DEFAULT_SETTINGS = {
   targetLanguage: "ja",
-  apiEndpoint: "",
-  developerMode: false,
+  apiEndpoint: "https://stm-backend-sxbj32ez6q-an.a.run.app",
 };
 
 // Store chrome reference at load time (content script context)
