@@ -1,6 +1,6 @@
 {
   "name": "slack-thread-summarizer-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Backend for Slack Thread Multilingual Summarizer",
   "main": "dist/app.js",
   "scripts": {
