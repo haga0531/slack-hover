@@ -15,6 +15,32 @@ Summarize Slack threads in your preferred language with AI.
 - Privacy-focused: No one knows when you request a summary (unlike Slack's translation stamps)
 - Workspace-shared cache for faster responses
 
+## Installation
+
+### 1. Install Slack App
+
+Click the button below to install the Slack app to your workspace:
+
+<a href="https://slack.com/oauth/v2/authorize?client_id=1902554001589.10235594297200&scope=commands,chat:write,channels:history,groups:history,users:read"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" /></a>
+
+> Note: You may see a warning about the app not being reviewed. This is expected for apps not listed in the Slack App Directory.
+
+### 2. Install Chrome Extension
+
+Download the extension from the [Chrome Web Store](#) (coming soon) or load it manually:
+
+1. Download this repository
+2. Open Chrome → `chrome://extensions/`
+3. Enable **Developer mode**
+4. Click **Load unpacked** → Select the `extension/` folder
+
+### 3. Invite the Bot
+
+In each channel where you want to use the summarizer:
+```
+/invite @Thread Summarizer
+```
+
 ## Usage
 
 1. Hover over any Slack message to see the summarize icon
