@@ -25,14 +25,8 @@ async function saveLanguage(language) {
 document.addEventListener("DOMContentLoaded", () => {
   loadSettings();
 
-  // Language change handler
+  // Language change handler - auto-save on change
   document.getElementById("targetLanguage").addEventListener("change", (e) => {
     saveLanguage(e.target.value);
-  });
-
-  // Open options handler
-  document.getElementById("openOptions").addEventListener("click", (e) => {
-    e.preventDefault();
-    chrome.runtime.openOptionsPage();
   });
 });

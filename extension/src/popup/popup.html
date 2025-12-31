@@ -7,96 +7,193 @@
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      width: 280px;
-      margin: 0;
-      padding: 16px;
+      width: 300px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+
+    .container {
+      padding: 20px;
     }
 
     .header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: #fff;
+    }
+
+    .header-text h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .header-text p {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+
+    .settings-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 16px;
       margin-bottom: 16px;
     }
 
-    .header h1 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper select {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 32px 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
       color: #1d1c1d;
+      cursor: pointer;
+      min-width: 140px;
     }
 
-    .quick-settings label {
-      display: block;
+    .select-wrapper select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .select-wrapper::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 5px solid transparent;
+      border-top-color: #666;
+      pointer-events: none;
+    }
+
+    .tip {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px;
       font-size: 12px;
-      font-weight: 600;
-      color: #616061;
-      margin-bottom: 4px;
+      line-height: 1.5;
     }
 
-    .quick-settings select {
-      width: 100%;
-      padding: 8px;
-      font-size: 14px;
-      border: 1px solid #d1d1d1;
-      border-radius: 4px;
-      background: white;
+    .tip-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      opacity: 0.9;
+    }
+
+    .tip-text {
+      opacity: 0.9;
     }
 
     .footer {
       margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid #e0e0e0;
+      text-align: center;
     }
 
     .footer a {
-      color: #1264a3;
+      color: rgba(255, 255, 255, 0.7);
       text-decoration: none;
-      font-size: 12px;
+      font-size: 11px;
+      transition: color 0.2s;
     }
 
     .footer a:hover {
-      text-decoration: underline;
-    }
-
-    .info {
-      margin-top: 12px;
-      padding: 8px;
-      background: #f4f4f5;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #616061;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>Thread Summarizer</h1>
-  </div>
+  <div class="container">
+    <div class="header">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>Thread Summarizer</h1>
+        <p>AI-powered Slack summaries</p>
+      </div>
+    </div>
 
-  <div class="quick-settings">
-    <label for="targetLanguage">Summary Language</label>
-    <select id="targetLanguage">
-      <option value="ja">Japanese (日本語)</option>
-      <option value="en">English</option>
-      <option value="zh">Chinese (中文)</option>
-      <option value="ko">Korean (한국어)</option>
-      <option value="es">Spanish (Español)</option>
-      <option value="fr">French (Français)</option>
-      <option value="de">German (Deutsch)</option>
-    </select>
-  </div>
+    <div class="settings-card">
+      <div class="setting-row">
+        <span class="setting-label">Language</span>
+        <div class="select-wrapper">
+          <select id="targetLanguage">
+            <option value="ja">日本語</option>
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="ko">한국어</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-  <div class="info">
-    Hover over any Slack message and click the summarize icon to get a thread summary.
-  </div>
+    <div class="tip">
+      <svg class="tip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <span class="tip-text">Hover over any Slack message and click the globe icon to summarize.</span>
+    </div>
 
-  <div class="footer">
-    <a href="#" id="openOptions">Open Settings</a>
+    <div class="footer">
+      <a href="../../privacy-policy.html" target="_blank">Privacy Policy</a>
+    </div>
   </div>
 
   <script src="popup.js"></script>
