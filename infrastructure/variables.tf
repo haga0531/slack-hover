@@ -25,3 +25,9 @@ variable "gemini_model" {
   type        = string
   default     = "gemini-2.5-flash"
 }
+
+variable "github_repo" {
+  description = "GitHub repository (owner/repo format)"
+  type        = string
+  default     = "haga0531/slack-hover"
+}
