@@ -9,6 +9,9 @@ const DEFAULT_SETTINGS = {
 // Store chrome reference at load time (content script context)
 const chromeAPI = typeof chrome !== "undefined" ? chrome : null;
 
+// Local cache TTL: 30 days
+const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
 const StorageManager = {
   async getSettings() {
     if (!chromeAPI?.storage?.sync) {
@@ -51,6 +54,12 @@ const StorageManager = {
         const entry = cache[key];
 
         if (!entry) {
+          resolve(null);
+          return;
+        }
+
+        // Check TTL expiration
+        if (entry.timestamp && Date.now() - entry.timestamp > CACHE_TTL_MS) {
           resolve(null);
           return;
         }
