@@ -5,20 +5,26 @@ Summarize Slack threads in your preferred language with AI.
 ## Features
 
 - Hover over any Slack message to see a summarize icon
-- Click to get an AI-generated summary of the thread
-- Multi-language support (Japanese, English, Chinese, Korean, etc.)
-- Structured summaries with:
-  - Overview
-  - Decisions made
-  - TODOs and action items
-  - Blockers and unresolved issues
-  - Technical notes
+- Click to get an AI-generated summary (3-5 sentences)
+- Single message translation support
+- Multi-language support: English, Japanese, Chinese, Korean, Spanish, French, German
+- Privacy-focused: No one knows when you request a summary (unlike Slack's translation stamps)
+- Workspace-shared cache for faster responses
+
+## Security & Privacy
+
+- **Workspace Isolation**: All cached data is strictly isolated by Slack workspace ID
+- **No Raw Message Storage**: Only AI-generated summaries are cached, not original Slack messages
+- **Anonymous Usage**: No tracking of who requests summaries
+- **Slack API Validation**: Every request is validated through Slack's API
+- **HTTPS Only**: All communications are encrypted
+- **Auto-Expiry**: Server cache expires after 90 days, local cache after 30 days
 
 ## Architecture
 
 ```
 slack-hover/
-├── backend/          # Node.js + Slack Bolt backend
+├── backend/          # TypeScript + Express backend
 ├── extension/        # Chrome extension (Manifest V3)
 └── infrastructure/   # Terraform IaC
 ```
