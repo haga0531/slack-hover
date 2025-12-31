@@ -24,6 +24,7 @@ const receiver = new ExpressReceiver({
   installationStore: createInstallationStore(),
   installerOptions: {
     directInstall: true,
+    stateVerification: false,
   },
 });
 
