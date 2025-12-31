@@ -55,128 +55,64 @@ slack-hover/
 - **Browser Extension**: Chrome Extension (Manifest V3)
 - **Infrastructure**: Terraform
 
-## Self-Hosting Guide
-
-This is a self-hosted application. Each user needs to set up their own backend and Slack App.
+## Getting Started
 
 ### Prerequisites
 
 - Node.js 20+
-- Google Cloud account with billing enabled
-- Slack workspace admin access
+- Google Cloud Project with:
+  - Cloud Run
+  - Vertex AI
+  - Firestore
+  - Secret Manager
+- Slack App (create at api.slack.com)
 
-### Step 1: Create a Slack App
+### Backend Setup
 
-1. Go to https://api.slack.com/apps and click **Create New App**
-2. Choose **From scratch**, enter a name (e.g., "Thread Summarizer"), and select your workspace
-3. Go to **OAuth & Permissions** and add these Bot Token Scopes:
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Copy environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Configure your `.env` file with:
+   - Slack credentials (Client ID, Client Secret, Signing Secret)
+   - GCP Project ID
+
+5. Run in development mode:
+   ```bash
+   npm run dev
+   ```
+
+### Chrome Extension Setup
+
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Select the `extension/` directory
+5. Configure the API endpoint in extension options
+
+### Slack App Configuration
+
+1. Create a new Slack app at https://api.slack.com/apps
+2. Add the following OAuth scopes:
    - `commands`
    - `chat:write`
    - `channels:history`
    - `groups:history`
    - `users:read`
-4. Go to **Basic Information** and note down:
-   - **Client ID**
-   - **Client Secret**
-   - **Signing Secret**
-5. Go to **Slash Commands** and create a new command:
-   - Command: `/summarize`
-   - Request URL: `https://YOUR_CLOUD_RUN_URL/slack/events` (update after deployment)
-   - Description: "Summarize this thread"
-
-### Step 2: Set Up Google Cloud
-
-```bash
-# Create a new project
-gcloud projects create YOUR_PROJECT_ID
-gcloud config set project YOUR_PROJECT_ID
-
-# Enable required APIs
-gcloud services enable run.googleapis.com
-gcloud services enable aiplatform.googleapis.com
-gcloud services enable firestore.googleapis.com
-gcloud services enable secretmanager.googleapis.com
-
-# Create Firestore database
-gcloud firestore databases create --location=asia-northeast1
-
-# Store Slack secrets
-echo -n "YOUR_CLIENT_ID" | gcloud secrets create slack-client-id --data-file=-
-echo -n "YOUR_CLIENT_SECRET" | gcloud secrets create slack-client-secret --data-file=-
-echo -n "YOUR_SIGNING_SECRET" | gcloud secrets create slack-signing-secret --data-file=-
-echo -n "YOUR_STATE_SECRET" | gcloud secrets create slack-state-secret --data-file=-
-```
-
-### Step 3: Deploy Backend
-
-```bash
-cd backend
-npm install
-
-# Deploy to Cloud Run
-gcloud run deploy stm-backend \
-  --source . \
-  --region asia-northeast1 \
-  --allow-unauthenticated \
-  --set-secrets=SLACK_CLIENT_ID=slack-client-id:latest,SLACK_CLIENT_SECRET=slack-client-secret:latest,SLACK_SIGNING_SECRET=slack-signing-secret:latest,SLACK_STATE_SECRET=slack-state-secret:latest \
-  --set-env-vars=GCP_PROJECT_ID=YOUR_PROJECT_ID,NODE_ENV=production
-```
-
-After deployment, note your Cloud Run URL (e.g., `https://stm-backend-xxxxx-an.a.run.app`).
-
-### Step 4: Update Slack App URLs
-
-Go back to your Slack App settings:
-
-1. **OAuth & Permissions** → Add Redirect URL:
-   ```
-   https://YOUR_CLOUD_RUN_URL/slack/oauth_redirect
-   ```
-
-2. **Slash Commands** → Update Request URL:
-   ```
-   https://YOUR_CLOUD_RUN_URL/slack/events
-   ```
-
-3. **Install App** → Install to your workspace
-
-### Step 5: Set Up Chrome Extension
-
-1. Clone this repository
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable **Developer mode**
-4. Click **Load unpacked** and select the `extension/` directory
-5. Click the extension icon → **Options**
-6. Enter your Cloud Run URL as the API Endpoint
-7. Select your preferred language
-
-### Step 6: Invite the Bot
-
-In any Slack channel where you want to use the summarizer:
-```
-/invite @YourBotName
-```
-
-Now hover over any message to see the summarize icon!
-
----
-
-## Local Development
-
-### Backend
-
-```bash
-cd backend
-cp .env.example .env
-# Edit .env with your credentials
-npm install
-npm run dev
-```
-
-### Extension
-
-1. Load the `extension/` directory in Chrome (Developer mode)
-2. Update the API endpoint in options to `http://localhost:8080`
+3. Create a Slash Command: `/summarize`
+4. Set the Request URL to your Cloud Run URL
+5. Install the app to your workspace
 
 ## Deployment
 

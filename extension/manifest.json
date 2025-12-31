@@ -18,7 +18,7 @@
   "host_permissions": [
     "https://app.slack.com/*",
     "https://*.slack.com/*",
-    "https://*.run.app/*"
+    "https://stm-backend-sxbj32ez6q-an.a.run.app/*"
   ],
 
   "background": {
