@@ -17,7 +17,7 @@ vi.mock("../../../middleware/logger.js", () => ({
   },
 }));
 
-import { ThreadService } from "../../../services/slack/thread.service.js";
+import { ThreadService, clearGlobalUserCache } from "../../../services/slack/thread.service.js";
 
 describe("ThreadService", () => {
   const mockConversationsReplies = vi.fn();
@@ -34,6 +34,7 @@ describe("ThreadService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearGlobalUserCache(); // Clear global cache between tests
   });
 
   describe("fetchThreadMessages", () => {

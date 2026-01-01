@@ -91,7 +91,7 @@ describe("GeminiService", () => {
         generationConfig: {
           responseMimeType: "application/json",
           temperature: 0.2,
-          maxOutputTokens: 2048,
+          maxOutputTokens: 1024,
         },
       });
     });

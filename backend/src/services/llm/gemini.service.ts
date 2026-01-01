@@ -1,4 +1,4 @@
-import { VertexAI } from "@google-cloud/vertexai";
+import { VertexAI, type GenerativeModel } from "@google-cloud/vertexai";
 import { env } from "../../config/env.js";
 import { logger } from "../../middleware/logger.js";
 import type {
@@ -19,9 +19,16 @@ export interface GeminiServiceDeps {
   config?: GeminiServiceConfig;
 }
 
+const GENERATION_CONFIG = {
+  responseMimeType: "application/json",
+  temperature: 0.2,
+  maxOutputTokens: 1024, // Balance between TTFT and Japanese output length
+} as const;
+
 export class GeminiService {
   private vertexAI: VertexAI;
   private model: string;
+  private cachedGenerativeModel: GenerativeModel | null = null;
 
   constructor(deps?: GeminiServiceDeps) {
     const config = deps?.config ?? {
@@ -39,6 +46,49 @@ export class GeminiService {
     this.model = config.model;
   }
 
+  /** Reusing the model instance avoids repeated initialization overhead. */
+  private getModel(): GenerativeModel {
+    if (!this.cachedGenerativeModel) {
+      this.cachedGenerativeModel = this.vertexAI.getGenerativeModel({
+        model: this.model,
+        generationConfig: GENERATION_CONFIG,
+      });
+    }
+    return this.cachedGenerativeModel;
+  }
+
+  private async generateContent(
+    prompt: string,
+    targetLanguage: SupportedLanguage,
+    context: string
+  ): Promise<StructuredSummary> {
+    const generativeModel = this.getModel();
+    const result = await generativeModel.generateContent(prompt);
+    const response = result.response;
+    const candidate = response.candidates?.[0];
+    const text = candidate?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      logger.error(
+        {
+          candidates: JSON.stringify(response.candidates),
+          promptFeedback: JSON.stringify(response.promptFeedback),
+          finishReason: candidate?.finishReason,
+          context,
+        },
+        "Empty response from Gemini"
+      );
+      throw new Error(`Empty response from Gemini: ${candidate?.finishReason || "unknown"}`);
+    }
+
+    const parsed = JSON.parse(text) as Omit<StructuredSummary, "language">;
+
+    return {
+      ...parsed,
+      language: targetLanguage,
+    };
+  }
+
   async summarizeThread(
     messages: ThreadMessage[],
     targetLanguage: SupportedLanguage
@@ -46,38 +96,7 @@ export class GeminiService {
     const prompt = buildSummaryPrompt(messages, targetLanguage);
 
     try {
-      const generativeModel = this.vertexAI.getGenerativeModel({
-        model: this.model,
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.2,
-          maxOutputTokens: 2048,
-        },
-      });
-
-      const result = await generativeModel.generateContent(prompt);
-      const response = result.response;
-      const candidate = response.candidates?.[0];
-      const text = candidate?.content?.parts?.[0]?.text;
-
-      if (!text) {
-        logger.error(
-          {
-            candidates: JSON.stringify(response.candidates),
-            promptFeedback: JSON.stringify(response.promptFeedback),
-            finishReason: candidate?.finishReason,
-          },
-          "Empty response from Gemini"
-        );
-        throw new Error(`Empty response from Gemini: ${candidate?.finishReason || "unknown"}`);
-      }
-
-      const parsed = JSON.parse(text) as Omit<StructuredSummary, "language">;
-
-      return {
-        ...parsed,
-        language: targetLanguage,
-      };
+      return await this.generateContent(prompt, targetLanguage, "summarize");
     } catch (error) {
       logger.error(
         {
@@ -102,38 +121,7 @@ export class GeminiService {
     const prompt = buildTranslationPrompt(message, targetLanguage);
 
     try {
-      const generativeModel = this.vertexAI.getGenerativeModel({
-        model: this.model,
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.2,
-          maxOutputTokens: 2048,
-        },
-      });
-
-      const result = await generativeModel.generateContent(prompt);
-      const response = result.response;
-      const candidate = response.candidates?.[0];
-      const text = candidate?.content?.parts?.[0]?.text;
-
-      if (!text) {
-        logger.error(
-          {
-            candidates: JSON.stringify(response.candidates),
-            promptFeedback: JSON.stringify(response.promptFeedback),
-            finishReason: candidate?.finishReason,
-          },
-          "Empty response from Gemini (translate)"
-        );
-        throw new Error(`Empty response from Gemini: ${candidate?.finishReason || "unknown"}`);
-      }
-
-      const parsed = JSON.parse(text) as Omit<StructuredSummary, "language">;
-
-      return {
-        ...parsed,
-        language: targetLanguage,
-      };
+      return await this.generateContent(prompt, targetLanguage, "translate");
     } catch (error) {
       logger.error(
         {

@@ -1,13 +1,15 @@
 import type { Router, Request, Response } from "express";
 import { z } from "zod";
 import { WebClient } from "@slack/web-api";
-import { Firestore } from "@google-cloud/firestore";
 import { ThreadService } from "../../services/slack/thread.service.js";
 import { GeminiService } from "../../services/llm/gemini.service.js";
 import { CacheRepository } from "../../repositories/cache.repository.js";
+import { getSlackToken } from "../../repositories/token.repository.js";
 import { logger } from "../../middleware/logger.js";
-import { env } from "../../config/env.js";
 import type { SummaryResponse, SupportedLanguage } from "../../types/summary.js";
+
+// Singleton to avoid repeated model initialization overhead
+const geminiService = new GeminiService();
 
 const summaryRequestSchema = z.object({
   channel_id: z.string().min(1),
@@ -24,7 +26,6 @@ export function setupSummaryRoute(router: Router) {
     const requestId = crypto.randomUUID();
 
     try {
-      // Validate request body
       const parseResult = summaryRequestSchema.safeParse(req.body);
 
       if (!parseResult.success) {
@@ -43,7 +44,6 @@ export function setupSummaryRoute(router: Router) {
 
       const { channel_id, thread_ts, target_lang, team_id } = parseResult.data;
 
-      // Get Slack token from Firestore (validates workspace access)
       const token = await getSlackToken(team_id);
 
       if (!token) {
@@ -56,15 +56,14 @@ export function setupSummaryRoute(router: Router) {
         return;
       }
 
-      // Create Slack client to get current message count
       const slackClient = new WebClient(token);
-      const threadService = new ThreadService(slackClient);
+      const threadService = new ThreadService(slackClient, team_id);
 
-      // Fetch thread messages to get current count
-      const messages = await threadService.fetchThreadMessages(
-        channel_id,
-        thread_ts
-      );
+      // Parallel fetch: reduces latency by not waiting for cache check before Slack API
+      const [messages, cachedWithoutCount] = await Promise.all([
+        threadService.fetchThreadMessages(channel_id, thread_ts),
+        CacheRepository.get(team_id, channel_id, thread_ts, target_lang as SupportedLanguage),
+      ]);
 
       if (messages.length === 0) {
         const response: SummaryResponse = {
@@ -78,16 +77,8 @@ export function setupSummaryRoute(router: Router) {
 
       const currentMessageCount = messages.length;
 
-      // Check cache first (with message count validation)
-      const cached = await CacheRepository.get(
-        team_id,
-        channel_id,
-        thread_ts,
-        target_lang as SupportedLanguage,
-        currentMessageCount
-      );
-
-      if (cached) {
+      // Invalidate cache if thread has new messages
+      if (cachedWithoutCount && cachedWithoutCount.messageCount === currentMessageCount) {
         logger.info(
           { requestId, team_id, channel_id, thread_ts, target_lang },
           "Returning cached summary"
@@ -95,22 +86,20 @@ export function setupSummaryRoute(router: Router) {
 
         const response: SummaryResponse = {
           status: "ok",
-          summary: cached.summary,
-          messageCount: cached.messageCount,
+          summary: cachedWithoutCount.summary,
+          messageCount: cachedWithoutCount.messageCount,
         };
 
         res.json(response);
         return;
       }
 
-      // Cache miss - generate new summary
       logger.info(
         { requestId, team_id, channel_id, thread_ts, target_lang, messageCount: currentMessageCount },
         "Generating new summary"
       );
 
-      // Generate summary or translate single message
-      const geminiService = new GeminiService();
+      // Single message → translate, multiple → summarize
       const summary =
         messages.length === 1
           ? await geminiService.translateMessage(
@@ -122,7 +111,7 @@ export function setupSummaryRoute(router: Router) {
               target_lang as SupportedLanguage
             );
 
-      // Store in cache (async, don't wait)
+      // Fire-and-forget: don't block response for cache write
       CacheRepository.set(
         team_id,
         channel_id,
@@ -153,31 +142,4 @@ export function setupSummaryRoute(router: Router) {
       res.status(500).json(response);
     }
   });
-}
-
-async function getSlackToken(teamId: string): Promise<string | null> {
-  try {
-    const firestore = new Firestore({ projectId: env.GCP_PROJECT_ID });
-    const doc = await firestore
-      .collection("slack_installations")
-      .doc(teamId)
-      .get();
-
-    if (!doc.exists) {
-      return null;
-    }
-
-    const data = doc.data();
-    const installation = data?.installation;
-
-    if (!installation) {
-      return null;
-    }
-
-    // Return bot token
-    return installation.bot?.token || null;
-  } catch (error) {
-    logger.error({ teamId, error }, "Failed to get Slack token");
-    return null;
-  }
 }
