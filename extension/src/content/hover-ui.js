@@ -32,7 +32,7 @@ class HoverUIManager {
 
     icon.style.position = "fixed";
     icon.style.top = `${rect.top + 8}px`;
-    icon.style.left = `${rect.right - 40}px`;
+    icon.style.left = `${rect.right - 53}px`;
     icon.style.opacity = "1";
 
     document.body.appendChild(icon);
